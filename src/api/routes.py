@@ -1,8 +1,8 @@
 """
-API routes for diagnostic services
+Enhanced API routes with AI reasoning assistant
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Query
 from typing import List, Optional
 from loguru import logger
 
@@ -12,16 +12,16 @@ from ..models.schemas import (
     MedicalCondition,
 )
 from ..services.diagnostic import DiagnosticService
-from ..services.embedding import EmbeddingService
-from ..services.vector_store import VectorStoreService
+from ..services.ai_assistant import AIReasoningAssistant, ReportType
 from ..utils.audit import AuditLogger
 from ..config import get_settings
 
 # Create router
 router = APIRouter()
 
-# Global service instances (will be initialized on startup)
+# Global service instances
 diagnostic_service: Optional[DiagnosticService] = None
+ai_assistant: Optional[AIReasoningAssistant] = None
 audit_logger: Optional[AuditLogger] = None
 
 
@@ -32,6 +32,16 @@ def get_diagnostic_service() -> DiagnosticService:
         diagnostic_service = DiagnosticService()
         diagnostic_service.initialize()
     return diagnostic_service
+
+
+def get_ai_assistant() -> AIReasoningAssistant:
+    """Dependency to get AI assistant"""
+    global ai_assistant
+    if ai_assistant is None:
+        settings = get_settings()
+        api_key = getattr(settings, 'openai_api_key', None)
+        ai_assistant = AIReasoningAssistant(api_key=api_key)
+    return ai_assistant
 
 
 def get_audit_logger() -> AuditLogger:
@@ -159,6 +169,218 @@ async def get_system_stats(
         )
 
 
+@router.post(
+    "/analyze/enhanced",
+    status_code=status.HTTP_200_OK,
+    summary="🤖 Enhanced analysis with AI reasoning assistant",
+    description="Full diagnostic analysis PLUS AI-generated explanations and follow-up questions",
+)
+async def analyze_with_ai_enhancement(
+    patient_case: PatientCase,
+    include_explanation: bool = True,
+    include_questions: bool = True,
+    include_report: bool = False,
+    report_type: ReportType = ReportType.PHYSICIAN_SUMMARY,
+    user_id: Optional[str] = None,
+    service: DiagnosticService = Depends(get_diagnostic_service),
+    ai: AIReasoningAssistant = Depends(get_ai_assistant),
+    audit: AuditLogger = Depends(get_audit_logger),
+):
+    """
+    🚀 **Enhanced Diagnostic Analysis with AI Assistant**
+
+    This endpoint provides everything from standard analysis PLUS:
+    - 🗣️ Natural language explanations of diagnostic reasoning
+    - ❓ Intelligent follow-up questions to refine diagnosis
+    - 📋 Comprehensive medical reports (optional)
+
+    **Parameters:**
+    - `include_explanation`: Get detailed AI explanation of diagnosis
+    - `include_questions`: Get follow-up questions to ask patient
+    - `include_report`: Generate full medical report
+    - `report_type`: Type of report (physician_summary, patient_friendly, detailed_clinical)
+    """
+    try:
+        # Standard diagnostic analysis
+        result = service.analyze_patient_case(patient_case)
+
+        # Build enhanced response
+        enhanced_result = {
+            "diagnostic_result": result.model_dump(),
+            "ai_enhancements": {}
+        }
+
+        # Generate AI explanation if requested
+        if include_explanation and result.differential_diagnoses:
+            logger.info("Generating AI explanation...")
+            explanation = await ai.generate_detailed_explanation(patient_case, result)
+            enhanced_result["ai_enhancements"]["detailed_explanation"] = explanation
+
+        # Generate follow-up questions if requested
+        if include_questions and result.differential_diagnoses:
+            logger.info("Generating follow-up questions...")
+            questions = await ai.generate_follow_up_questions(patient_case, result, num_questions=5)
+            enhanced_result["ai_enhancements"]["follow_up_questions"] = questions
+
+        # Generate medical report if requested
+        if include_report and result.differential_diagnoses:
+            logger.info(f"Generating {report_type} report...")
+            report = await ai.generate_medical_report(patient_case, result, report_type)
+            enhanced_result["ai_enhancements"]["medical_report"] = {
+                "type": report_type,
+                "content": report
+            }
+
+        # Log to audit
+        audit.log_diagnostic_analysis(
+            case=patient_case,
+            result=result,
+            user_id=user_id,
+            user_role="physician",
+        )
+
+        return enhanced_result
+
+    except Exception as e:
+        logger.error(f"Enhanced analysis failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Enhanced analysis failed: {str(e)}"
+        )
+
+
+@router.post(
+    "/explain",
+    status_code=status.HTTP_200_OK,
+    summary="🎓 Explain diagnosis in simple terms",
+    description="Convert medical diagnosis into patient-friendly language",
+)
+async def explain_in_simple_terms(
+    condition_name: str,
+    technical_explanation: str,
+    ai: AIReasoningAssistant = Depends(get_ai_assistant),
+):
+    """
+    Convert medical jargon into patient-friendly language
+
+    Perfect for:
+    - Patient education materials
+    - Explaining test results
+    - Simplifying complex medical concepts
+    """
+    try:
+        simple_explanation = await ai.explain_in_simple_terms(
+            condition_name,
+            technical_explanation
+        )
+
+        return {
+            "condition": condition_name,
+            "simple_explanation": simple_explanation,
+            "reading_level": "Grade 6-8 (Patient-friendly)"
+        }
+
+    except Exception as e:
+        logger.error(f"Explanation failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Explanation failed: {str(e)}"
+        )
+
+
+@router.post(
+    "/treatment-recommendations",
+    status_code=status.HTTP_200_OK,
+    summary="💊 Get AI treatment recommendations",
+    description="Generate evidence-based treatment recommendations for a diagnosis",
+)
+async def get_treatment_recommendations(
+    case_id: str,
+    diagnosis_name: str,
+    patient_age: int,
+    patient_sex: str,
+    confidence_score: float,
+    ai: AIReasoningAssistant = Depends(get_ai_assistant),
+):
+    """
+    Generate treatment recommendations using AI
+
+    Returns:
+    - Immediate actions
+    - Diagnostic workup
+    - Initial treatment options
+    - Specialist referrals
+    - Patient counseling points
+    - Red flags to watch for
+    """
+    try:
+        # Create minimal diagnosis object
+        from ..models.schemas import DifferentialDiagnosis, UrgencyLevel
+        diagnosis = DifferentialDiagnosis(
+            condition_id=f"cond_{diagnosis_name.lower().replace(' ', '_')}",
+            condition_name=diagnosis_name,
+            similarity_score=confidence_score,
+            confidence_score=confidence_score,
+            probability=confidence_score,
+            urgency_level=UrgencyLevel.ROUTINE
+        )
+
+        # Create minimal patient case
+        from ..models.schemas import PatientCase, Sex
+        patient_case = PatientCase(
+            case_id=case_id,
+            age=patient_age,
+            sex=Sex(patient_sex.lower()),
+            chief_complaint="",
+            symptoms=[]
+        )
+
+        recommendations = await ai.generate_treatment_recommendations(diagnosis, patient_case)
+
+        return recommendations
+
+    except Exception as e:
+        logger.error(f"Treatment recommendations failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Treatment recommendations failed: {str(e)}"
+        )
+
+
+@router.get(
+    "/stats",
+    status_code=status.HTTP_200_OK,
+    summary="Get system statistics",
+)
+async def get_system_stats(
+    service: DiagnosticService = Depends(get_diagnostic_service),
+):
+    """
+    Get statistics about the vector database and system
+    """
+    try:
+        stats = service.vector_store.get_collection_stats()
+        return {
+            "status": "operational",
+            "vector_database": stats,
+            "ai_assistant": "enabled",
+            "features": {
+                "vector_search": True,
+                "ai_explanations": True,
+                "follow_up_questions": True,
+                "medical_reports": True,
+                "treatment_recommendations": True
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get stats: {str(e)}"
+        )
+
+
 @router.get(
     "/health",
     status_code=status.HTTP_200_OK,
@@ -167,11 +389,10 @@ async def get_system_stats(
 async def health_check():
     """
     Simple health check endpoint
-
-    **Output**: Service status
     """
     return {
         "status": "healthy",
         "service": "Medical Symptom Constellation Mapper",
-        "version": "0.1.0"
+        "version": "0.2.0",
+        "ai_features": "enabled"
     }
