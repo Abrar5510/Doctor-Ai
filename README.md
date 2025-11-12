@@ -87,8 +87,17 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-### Step 5: Start Supporting Services
+### Step 5: Set Up Qdrant Vector Database
 
+Qdrant can be set up in multiple ways. Choose the option that works best for you:
+
+**Quick Setup (Automated):**
+```bash
+chmod +x scripts/setup_qdrant.sh
+./scripts/setup_qdrant.sh
+```
+
+**Manual Setup with Docker:**
 ```bash
 docker-compose up -d
 ```
@@ -98,7 +107,26 @@ This will start:
 - PostgreSQL (port 5432)
 - Redis (port 6379)
 
+**Having issues?** See our comprehensive [Qdrant Setup Guide](QDRANT_SETUP.md) for:
+- Docker installation
+- Binary installation (no Docker needed)
+- Qdrant Cloud setup
+- Troubleshooting common errors
+
 ## ⚡ Quick Start
+
+### 0. Test Qdrant Connection (Optional but Recommended)
+
+Verify that Qdrant is running and accessible:
+
+```bash
+python scripts/test_qdrant_connection.py
+```
+
+This will test:
+- Connection to Qdrant
+- Permission to create collections
+- Existence of medical_conditions collection
 
 ### 1. Seed the Database
 
