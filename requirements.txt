@@ -6,7 +6,7 @@ pydantic==2.5.0
 pydantic-settings==2.1.0
 
 # Vector Database
-qdrant-client==1.7.0
+qdrant-client==1.7.3
 
 # ML & NLP
 transformers==4.35.2
