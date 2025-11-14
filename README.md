@@ -64,8 +64,8 @@ An AI-powered diagnostic support system that maps patient symptoms to potential 
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/doctor-ai.git
-cd doctor-ai
+git clone https://github.com/Abrar5510/Doctor-Ai.git
+cd Doctor-Ai
 ```
 
 ### Step 2: Create Virtual Environment
@@ -510,9 +510,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Project Link**: https://github.com/yourusername/doctor-ai
-- **Issues**: https://github.com/yourusername/doctor-ai/issues
-- **Discussions**: https://github.com/yourusername/doctor-ai/discussions
+- **Project Link**: https://github.com/Abrar5510/Doctor-Ai
+- **Issues**: https://github.com/Abrar5510/Doctor-Ai/issues
+- **Discussions**: https://github.com/Abrar5510/Doctor-Ai/discussions
 
 ## ⚠️ Disclaimer
 
