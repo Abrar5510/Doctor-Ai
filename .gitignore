@@ -67,3 +67,30 @@ models/*.pth
 
 # Qdrant data
 qdrant_storage/
+
+# Large datasets (too big for GitHub)
+datasets/mimic/
+datasets/umls/
+datasets/snomed/
+datasets/genomic/
+datasets/imaging/
+
+# Downloaded archives
+*.tar.gz
+*.zip
+*.7z
+*.gz
+
+# Large ontology downloads
+datasets/ontologies/snomed_ct/
+datasets/ontologies/umls/
+
+# Temporary processing files
+datasets/temp/
+datasets/processed/large_*
+
+# Keep small datasets but ignore large processed files
+datasets/**/*.bin
+datasets/**/*.pkl
+datasets/**/*.h5
+datasets/**/*.hdf5
