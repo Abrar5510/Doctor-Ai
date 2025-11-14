@@ -23,6 +23,7 @@ An AI-powered diagnostic support system that maps patient symptoms to potential 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
+- [Medical Datasets](#medical-datasets)
 - [API Documentation](#api-documentation)
 - [Configuration](#configuration)
 - [Development](#development)
@@ -222,6 +223,63 @@ The system automatically routes cases based on confidence:
 - **Tier 2** (60-85%): Primary care physician review recommended
 - **Tier 3** (40-60%): Specialist consultation required
 - **Tier 4** (<40%): Multi-disciplinary team review needed
+
+## 📊 Medical Datasets
+
+Doctor-Ai integrates multiple comprehensive medical datasets to provide accurate diagnostic support.
+
+### Available Datasets
+
+#### 1. Human Phenotype Ontology (HPO)
+- **Size**: ~50MB
+- **Content**: 15,247 phenotype terms, 8,000+ rare disease annotations
+- **Use**: Rare disease detection, phenotype-based diagnosis
+
+#### 2. ICD-10-CM Disease Codes
+- **Size**: ~50MB
+- **Content**: 70,000+ diagnostic codes
+- **Use**: Disease classification, diagnosis coding
+
+#### 3. Disease-Symptom Mappings
+- **Size**: ~5MB
+- **Content**: Curated disease-symptom relationships
+- **Use**: ML training, symptom analysis
+
+### Download Datasets
+
+Download all priority datasets (safe for GitHub, ~105MB total):
+
+```bash
+python scripts/download_datasets/download_all_priority.py
+```
+
+Download individual datasets:
+
+```bash
+# Human Phenotype Ontology
+python scripts/download_datasets/download_hpo.py
+
+# ICD-10-CM codes
+python scripts/download_datasets/download_icd10.py
+
+# Disease-symptom datasets
+python scripts/download_datasets/download_disease_symptoms.py
+```
+
+### Large External Datasets
+
+The following datasets are too large for GitHub and require external storage:
+
+- **MIMIC-III/IV** (~60-100GB): Clinical ICU data - [Requires PhysioNet credentials](https://physionet.org/)
+- **UMLS** (~10GB): Unified medical terminology - [Requires NLM registration](https://www.nlm.nih.gov/research/umls/)
+- **SNOMED CT** (~2GB): Comprehensive clinical terminology - [Requires NLM license](https://www.nlm.nih.gov/healthit/snomedct/us_edition.html)
+
+### Documentation
+
+For comprehensive dataset information, download instructions, and integration guides:
+- **Full Dataset Catalog**: See [MEDICAL_DATASETS.md](MEDICAL_DATASETS.md)
+- **Download Scripts**: See [scripts/download_datasets/README.md](scripts/download_datasets/README.md)
+- **Dataset Directory**: See [datasets/README.md](datasets/README.md)
 
 ## 📚 API Documentation
 
