@@ -65,11 +65,12 @@ We are committed to the following response times:
 
 Doctor-AI implements HIPAA-compliant security measures:
 
-- ✅ **Audit Logging**: All data access is logged
+- ✅ **Audit Logging**: All data access is logged with comprehensive trail
 - ✅ **Data Anonymization**: PII removal capabilities
-- ✅ **Access Control**: Role-based access (when configured)
-- ✅ **Encryption**: Data encryption in transit (HTTPS)
-- ✅ **Session Management**: Secure session handling
+- ✅ **Access Control**: JWT-based authentication with role-based access control (RBAC)
+- ✅ **Encryption**: Data encryption in transit (HTTPS) and password hashing (bcrypt)
+- ✅ **Session Management**: Secure session handling with token revocation
+- ✅ **Account Security**: Failed login protection, account lockout, password policies
 
 #### Data Handling
 
@@ -81,16 +82,36 @@ Doctor-AI implements HIPAA-compliant security measures:
 
 ### Infrastructure Security
 
+#### Authentication & Authorization
+
+- **JWT Authentication**: Stateless authentication with HS256 algorithm
+- **Role-Based Access Control (RBAC)**: Five user roles (Admin, Physician, Nurse, Researcher, API User)
+- **Password Security**:
+  - Minimum 12 characters with complexity requirements
+  - bcrypt hashing with automatic salts
+  - Common password detection
+  - Sequential/repeated character prevention
+  - Password strength meter
+- **Account Protection**:
+  - Account lockout after 5 failed login attempts (30-minute lock)
+  - Session tracking and revocation
+  - Token expiration and refresh
+  - Password change forces logout from all sessions
+- **API Key Management**: Scoped access with rate limits and usage tracking
+
 #### Application Security
 
 - **Environment Variables**: Sensitive configuration stored in environment variables
-- **Secret Management**: No hardcoded credentials
-- **Input Validation**: All API inputs are validated and sanitized
+- **Secret Management**: No hardcoded credentials, enforced strong secrets in production
+- **Input Validation**: All API inputs are validated and sanitized via Pydantic
+- **Prompt Injection Protection**: Advanced LLM input sanitization
 - **Output Encoding**: Protection against injection attacks
-- **CORS Configuration**: Proper cross-origin resource sharing policies
-- **SQL Injection Protection**: Parameterized queries and ORM usage
+- **CORS Configuration**: Strict origin restrictions (no wildcards in production)
+- **SQL Injection Protection**: Parameterized queries and SQLAlchemy ORM
 - **XSS Protection**: Input sanitization and output encoding
 - **CSRF Protection**: Token-based CSRF prevention
+- **Rate Limiting**: 100 requests/minute per IP (configurable)
+- **Security Headers**: OWASP-recommended HTTP security headers
 
 #### Database Security
 
@@ -116,10 +137,23 @@ Doctor-AI implements HIPAA-compliant security measures:
 
 #### Prompt Injection Protection
 
+Doctor-AI implements comprehensive protection against prompt injection attacks:
+
+- **Pattern Detection**: Identifies malicious instruction patterns
+- **Keyword Analysis**: Detects suspicious commands and jailbreak attempts
+- **Character Analysis**: Flags excessive special characters indicating encoding
+- **HTML/Script Removal**: Strips potentially dangerous tags
 - **Input Sanitization**: Clean user inputs before LLM processing
 - **Output Validation**: Validate LLM outputs before returning to users
-- **Context Limits**: Limit context window size
+- **Context Limits**: Limit context window size (5000 characters max)
 - **Rate Limiting**: Prevent API abuse
+
+**Blocked Patterns Include**:
+- System instruction manipulation ("ignore previous instructions")
+- Jailbreak attempts (DAN, developer mode, god mode)
+- Code execution attempts (eval, exec, system)
+- Encoding/obfuscation (base64, hex, rot13)
+- XSS patterns (script tags, javascript:, event handlers)
 
 ## Security Best Practices
 
@@ -324,9 +358,65 @@ Doctor-AI includes features to support HIPAA compliance but requires proper depl
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 - [CIS Docker Benchmark](https://www.cisecurity.org/benchmark/docker)
 
+## Security Enhancements (v0.2.0)
+
+### Recent Security Improvements
+
+**Authentication & Authorization (NEW)**
+- Implemented JWT-based authentication system
+- Added role-based access control with 5 distinct roles
+- Created user management system with PostgreSQL
+- Session tracking and token revocation capabilities
+
+**Password Security (NEW)**
+- Strong password requirements (12+ chars, complexity rules)
+- bcrypt hashing with automatic salts
+- Common password detection (blocks 25+ weak passwords)
+- Sequential and repeated character prevention
+- Dictionary word detection
+- Password strength meter (weak/medium/strong/very strong)
+- Account lockout after failed attempts
+
+**API Security (NEW)**
+- Rate limiting middleware (100 req/min default)
+- CORS restriction enforcement (no wildcards in production)
+- Security headers middleware (OWASP best practices)
+- LLM prompt injection protection
+- Input sanitization for all medical data
+
+**Database Security (NEW)**
+- User table with comprehensive audit fields
+- Session management table
+- API key table with scoped access
+- Audit log table for HIPAA compliance
+
+### Security Configuration
+
+**Required Environment Variables**:
+```bash
+# Generate strong secret (minimum 32 characters)
+SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+
+# Restrict CORS origins (comma-separated)
+CORS_ORIGINS=https://app.example.com,https://api.example.com
+
+# Enable rate limiting
+RATE_LIMIT_ENABLED=True
+RATE_LIMIT_REQUESTS=100
+```
+
+**Database Initialization**:
+```bash
+# Initialize database with user tables
+python scripts/init_db.py
+
+# Default admin created: username=admin, password=ChangeMe123!@#
+# IMPORTANT: Change default admin password immediately!
+```
+
 ## Updates
 
-This security policy is reviewed and updated regularly. Last updated: 2025-11-14
+This security policy is reviewed and updated regularly. Last updated: 2025-11-15
 
 ---
 

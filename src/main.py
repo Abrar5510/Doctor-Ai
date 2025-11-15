@@ -9,6 +9,9 @@ import sys
 
 from .config import get_settings
 from .api.routes import router
+from .api.auth_routes import router as auth_router
+from .middleware.rate_limit import RateLimitMiddleware
+from .middleware.security import SecurityHeadersMiddleware
 
 # Configure logging
 logger.remove()  # Remove default handler
@@ -59,16 +62,37 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Configure CORS
+# Add security headers middleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Add rate limiting middleware
+if settings.rate_limit_enabled:
+    app.add_middleware(
+        RateLimitMiddleware,
+        requests_per_minute=settings.rate_limit_requests,
+    )
+    logger.info(
+        f"Rate limiting enabled: {settings.rate_limit_requests} requests per minute"
+    )
+
+# Configure CORS with proper origin restrictions
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=settings.get_cors_origins(),
+    allow_credentials=settings.cors_allow_credentials,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
+)
+logger.info(f"CORS origins configured: {settings.get_cors_origins()}")
+
+# Include authentication routes (no auth required)
+app.include_router(
+    auth_router,
+    prefix=settings.api_prefix,
 )
 
-# Include API routes
+# Include API routes (diagnostic endpoints)
 app.include_router(
     router,
     prefix=settings.api_prefix,
