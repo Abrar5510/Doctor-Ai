@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import sys
+from contextlib import asynccontextmanager
 
 from .config import get_settings
 from .api.routes import router
@@ -30,8 +31,22 @@ logger.add(
 # Get settings
 settings = get_settings()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager for startup and shutdown events"""
+    # Startup
+    logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+    logger.info(f"Debug mode: {settings.debug}")
+    logger.info(f"API prefix: {settings.api_prefix}")
+    yield
+    # Shutdown
+    logger.info("Shutting down application")
+
+
 # Create FastAPI app
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.app_name,
     version=settings.app_version,
     description="""
@@ -98,20 +113,6 @@ app.include_router(
     prefix=settings.api_prefix,
     tags=["diagnostic"],
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize services on startup"""
-    logger.info(f"Starting {settings.app_name} v{settings.app_version}")
-    logger.info(f"Debug mode: {settings.debug}")
-    logger.info(f"API prefix: {settings.api_prefix}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
-    logger.info("Shutting down application")
 
 
 @app.get("/")

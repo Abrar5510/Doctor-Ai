@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     embedding_dimension: int = 768
     max_sequence_length: int = 512
 
+    # AI Assistant (OpenAI)
+    openai_api_key: Optional[str] = None
+    use_local_llm: bool = False
+    local_llm_model: str = "llama2"
+
     # Medical Ontology
     use_snomed_ct: bool = True
     use_icd10: bool = True
@@ -79,6 +84,7 @@ class Settings(BaseSettings):
     enable_rare_disease_detection: bool = True
     enable_red_flag_alerts: bool = True
     enable_temporal_analysis: bool = True
+    enable_ai_assistant: bool = True
 
     class Config:
         env_file = ".env"
