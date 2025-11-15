@@ -100,7 +100,7 @@ chmod +x scripts/setup_qdrant.sh
 
 **Manual Setup with Docker:**
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start:
@@ -108,11 +108,19 @@ This will start:
 - PostgreSQL (port 5432)
 - Redis (port 6379)
 
-**Having issues?** See our comprehensive [Qdrant Setup Guide](QDRANT_SETUP.md) for:
-- Docker installation
-- Binary installation (no Docker needed)
-- Qdrant Cloud setup
-- Troubleshooting common errors
+**Getting "error getting credentials" error?** Run this first:
+```bash
+./fix-docker-credentials.sh
+```
+See [DOCKER_CREDENTIAL_FIX.md](DOCKER_CREDENTIAL_FIX.md) for details.
+
+**Having other issues?** See our comprehensive guides:
+- [Docker Setup & Troubleshooting](DOCKER.md)
+- [Qdrant Setup Guide](QDRANT_SETUP.md) for:
+  - Docker installation
+  - Binary installation (no Docker needed)
+  - Qdrant Cloud setup
+  - Troubleshooting common errors
 
 ## ⚡ Quick Start
 

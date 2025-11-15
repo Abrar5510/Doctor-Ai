@@ -213,7 +213,20 @@ docker compose logs -f api
 
 If you encounter an error like `error getting credentials - err: exit status 1, out: ''` when pulling Docker images (especially Qdrant):
 
-**Solution 1: Clear Docker credential helpers**
+**QUICK FIX (Recommended):**
+```bash
+./fix-docker-credentials.sh
+```
+
+This automated script will:
+- Backup your Docker config
+- Remove the problematic credential helper
+- Clear cached credentials
+- Pre-pull all required images
+
+For detailed manual steps, see [DOCKER_CREDENTIAL_FIX.md](DOCKER_CREDENTIAL_FIX.md)
+
+**Solution 1: Clear Docker credential helpers (Manual)**
 ```bash
 # Edit or create ~/.docker/config.json
 # Remove or comment out the "credsStore" line
