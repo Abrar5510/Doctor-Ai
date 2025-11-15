@@ -347,7 +347,7 @@ Each dataset has its own license. See `../MEDICAL_DATASETS.md` for specific lice
 
 ## Support
 
-- Issues: https://github.com/yourusername/doctor-ai/issues
+- Issues: https://github.com/Abrar5510/Doctor-Ai/issues
 - Documentation: `../MEDICAL_DATASETS.md`
 - Download help: `../scripts/download_datasets/README.md`
 
