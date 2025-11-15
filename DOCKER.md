@@ -209,6 +209,49 @@ docker compose logs -f api
 
 ## Troubleshooting
 
+### Issue: "Error getting credentials" when pulling images
+
+If you encounter an error like `error getting credentials - err: exit status 1, out: ''` when pulling Docker images (especially Qdrant):
+
+**Solution 1: Clear Docker credential helpers**
+```bash
+# Edit or create ~/.docker/config.json
+# Remove or comment out the "credsStore" line
+nano ~/.docker/config.json
+
+# Change from:
+# {
+#   "credsStore": "desktop"
+# }
+
+# To:
+# {
+# }
+```
+
+**Solution 2: Login to Docker Hub**
+```bash
+# Logout first
+docker logout
+
+# Login again (optional - public images don't require login)
+docker login
+```
+
+**Solution 3: Pull the image manually**
+```bash
+# Pull the specific image first
+docker pull qdrant/qdrant:v1.7.4
+
+# Then start services
+docker compose up -d
+```
+
+**What was fixed:**
+- Changed from `qdrant/qdrant:latest` to `qdrant/qdrant:v1.7.4` (specific version)
+- Added `pull_policy: missing` to avoid unnecessary pull attempts
+- Using specific tags helps avoid credential helper issues
+
 ### Issue: "docker compose: command not found"
 
 **Solution 1:** You have Docker Compose v1, use `docker-compose` instead:
