@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
+    # CORS Settings
+    cors_origins: str = "http://localhost:3000,http://localhost:8000"  # Comma-separated list
+    cors_allow_credentials: bool = True
+
+    # Rate Limiting
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 100  # requests per minute
+    rate_limit_period: int = 60  # seconds
+
     # Database
     database_url: str = "postgresql://user:password@localhost:5432/doctor_ai"
     database_echo: bool = False
@@ -75,8 +84,27 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = False
 
+    def get_cors_origins(self) -> list:
+        """Get CORS origins as a list."""
+        if self.debug:
+            return ["*"]  # Allow all in debug mode
+        return [origin.strip() for origin in self.cors_origins.split(",")]
+
+    def validate_secret_key(self) -> bool:
+        """Validate that secret key is strong enough for production."""
+        if not self.debug and (
+            self.secret_key == "dev-secret-key-change-in-production"
+            or len(self.secret_key) < 32
+        ):
+            raise ValueError(
+                "SECRET_KEY must be changed from default and be at least 32 characters long in production"
+            )
+        return True
+
 
 @lru_cache()
 def get_settings() -> Settings:
     """Get cached settings instance"""
-    return Settings()
+    settings = Settings()
+    settings.validate_secret_key()
+    return settings
