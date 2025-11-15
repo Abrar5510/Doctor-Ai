@@ -38,7 +38,8 @@ class VectorStoreService:
             return  # Already initialized
 
         try:
-            logger.info(f"Connecting to Qdrant at {self.settings.qdrant_host}:{self.settings.qdrant_port}")
+            # Try to connect to remote Qdrant first
+            logger.info(f"Attempting to connect to Qdrant at {self.settings.qdrant_host}:{self.settings.qdrant_port}")
 
             self.client = QdrantClient(
                 host=self.settings.qdrant_host,
@@ -51,8 +52,17 @@ class VectorStoreService:
             logger.info(f"Connected to Qdrant. Found {len(collections.collections)} collections")
 
         except Exception as e:
-            logger.error(f"Failed to connect to Qdrant: {e}")
-            raise
+            logger.warning(f"Failed to connect to remote Qdrant: {e}")
+            logger.info("Falling back to local file-based Qdrant storage")
+
+            try:
+                # Use local file-based storage
+                self.client = QdrantClient(path="./qdrant_data")
+                collections = self.client.get_collections()
+                logger.info(f"Connected to local Qdrant. Found {len(collections.collections)} collections")
+            except Exception as local_error:
+                logger.error(f"Failed to initialize local Qdrant: {local_error}")
+                raise
 
     def create_collection(self, recreate: bool = False):
         """
