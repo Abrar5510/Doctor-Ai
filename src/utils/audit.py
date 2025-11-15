@@ -3,6 +3,8 @@ Audit logging for HIPAA compliance and regulatory requirements
 """
 
 import json
+import hmac
+import hashlib
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -202,19 +204,32 @@ class AuditLogger:
 
     def _anonymize_patient_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Anonymize patient data for HIPAA compliance
+        Anonymize patient data for HIPAA compliance using HMAC-SHA256
+
+        Uses cryptographically secure HMAC-SHA256 for one-way hashing of
+        patient identifiers, ensuring HIPAA compliance while maintaining
+        the ability to track the same patient across sessions.
 
         Args:
             data: Patient data dictionary
 
         Returns:
-            Anonymized data
+            Anonymized data with HIPAA-compliant hashing
         """
         anonymized = data.copy()
 
-        # Remove or hash identifiable information
+        # Use HMAC-SHA256 for secure, one-way hashing of patient identifiers
         if "patient_id" in anonymized:
-            anonymized["patient_id"] = f"anon_{hash(anonymized['patient_id']) % 1000000}"
+            patient_id = str(anonymized['patient_id'])
+            # Use secret key from settings for HMAC
+            secret = self.settings.secret_key.encode('utf-8') if self.settings.secret_key else b'default-audit-key'
+            hashed = hmac.new(
+                secret,
+                patient_id.encode('utf-8'),
+                hashlib.sha256
+            ).hexdigest()
+            # Take first 12 characters for readability while maintaining uniqueness
+            anonymized["patient_id"] = f"anon_{hashed[:12]}"
 
         # Keep only necessary demographic information
         # Remove specific locations if present

@@ -52,12 +52,17 @@ class ReviewTier(str, Enum):
 
 class SymptomInput(BaseModel):
     """Input model for patient-reported symptoms"""
-    description: str = Field(..., description="Free-text symptom description")
+    description: str = Field(
+        ...,
+        description="Free-text symptom description",
+        min_length=3,
+        max_length=500
+    )
     severity: Severity = Field(default=Severity.MODERATE, description="Symptom severity")
-    duration_days: Optional[int] = Field(None, description="Duration in days", ge=0)
+    duration_days: Optional[int] = Field(None, description="Duration in days", ge=0, le=36500)  # Max ~100 years
     frequency: Frequency = Field(default=Frequency.CONSTANT, description="Symptom frequency")
     onset_date: Optional[date] = Field(None, description="When symptom first appeared")
-    location: Optional[str] = Field(None, description="Body location if applicable")
+    location: Optional[str] = Field(None, description="Body location if applicable", max_length=100)
 
     class Config:
         json_schema_extra = {
@@ -177,30 +182,43 @@ class MedicalCondition(BaseModel):
 
 class PatientCase(BaseModel):
     """Patient case information (de-identified for HIPAA compliance)"""
-    case_id: str = Field(..., description="Unique case identifier")
-    patient_id: Optional[str] = Field(None, description="De-identified patient ID")
+    case_id: str = Field(..., description="Unique case identifier", max_length=100)
+    patient_id: Optional[str] = Field(None, description="De-identified patient ID", max_length=100)
 
     # Demographics
     age: int = Field(..., description="Patient age", ge=0, le=150)
     sex: Sex = Field(..., description="Biological sex")
-    ethnicity: Optional[str] = Field(None, description="Ethnicity")
+    ethnicity: Optional[str] = Field(None, description="Ethnicity", max_length=100)
 
     # Symptoms
-    symptoms: List[SymptomInput] = Field(..., description="Patient symptoms")
-    chief_complaint: str = Field(..., description="Primary complaint")
+    symptoms: List[SymptomInput] = Field(
+        ...,
+        description="Patient symptoms",
+        min_length=1,
+        max_length=50  # Prevent DoS with excessive symptoms
+    )
+    chief_complaint: str = Field(
+        ...,
+        description="Primary complaint",
+        min_length=3,
+        max_length=1000
+    )
 
     # Medical History
     medical_history: List[str] = Field(
         default_factory=list,
-        description="Past medical conditions"
+        description="Past medical conditions",
+        max_length=100
     )
     family_history: List[str] = Field(
         default_factory=list,
-        description="Family medical history"
+        description="Family medical history",
+        max_length=100
     )
     current_medications: List[str] = Field(
         default_factory=list,
-        description="Current medications"
+        description="Current medications",
+        max_length=100
     )
 
     # Lab & Test Results

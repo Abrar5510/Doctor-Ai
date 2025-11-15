@@ -5,6 +5,7 @@ Enhanced API routes with AI reasoning assistant
 from fastapi import APIRouter, HTTPException, Depends, status, Query
 from typing import List, Optional
 from loguru import logger
+from functools import lru_cache
 
 from ..models.schemas import (
     PatientCase,
@@ -19,37 +20,39 @@ from ..config import get_settings
 # Create router
 router = APIRouter()
 
-# Global service instances
-diagnostic_service: Optional[DiagnosticService] = None
-ai_assistant: Optional[AIReasoningAssistant] = None
-audit_logger: Optional[AuditLogger] = None
 
-
+# Thread-safe singleton dependencies using lru_cache
+@lru_cache(maxsize=1)
 def get_diagnostic_service() -> DiagnosticService:
-    """Dependency to get diagnostic service"""
-    global diagnostic_service
-    if diagnostic_service is None:
-        diagnostic_service = DiagnosticService()
-        diagnostic_service.initialize()
-    return diagnostic_service
+    """
+    Dependency to get diagnostic service (singleton pattern).
+    Thread-safe via lru_cache.
+    """
+    service = DiagnosticService()
+    service.initialize()
+    return service
 
 
+@lru_cache(maxsize=1)
 def get_ai_assistant() -> AIReasoningAssistant:
-    """Dependency to get AI assistant"""
-    global ai_assistant
-    if ai_assistant is None:
-        settings = get_settings()
-        api_key = getattr(settings, 'openai_api_key', None)
-        ai_assistant = AIReasoningAssistant(api_key=api_key)
-    return ai_assistant
+    """
+    Dependency to get AI assistant (singleton pattern).
+    Thread-safe via lru_cache.
+    """
+    settings = get_settings()
+    api_key = getattr(settings, 'openai_api_key', None)
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY environment variable is not set")
+    return AIReasoningAssistant(api_key=api_key)
 
 
+@lru_cache(maxsize=1)
 def get_audit_logger() -> AuditLogger:
-    """Dependency to get audit logger"""
-    global audit_logger
-    if audit_logger is None:
-        audit_logger = AuditLogger()
-    return audit_logger
+    """
+    Dependency to get audit logger (singleton pattern).
+    Thread-safe via lru_cache.
+    """
+    return AuditLogger()
 
 
 @router.post(
@@ -152,13 +155,21 @@ async def get_system_stats(
     """
     Get statistics about the vector database and system
 
-    **Output**: Collection statistics, total conditions, etc.
+    **Output**: Collection statistics, total conditions, AI features, etc.
     """
     try:
         stats = service.vector_store.get_collection_stats()
         return {
             "status": "operational",
             "vector_database": stats,
+            "ai_assistant": "enabled",
+            "features": {
+                "vector_search": True,
+                "ai_explanations": True,
+                "follow_up_questions": True,
+                "medical_reports": True,
+                "treatment_recommendations": True
+            }
         }
 
     except Exception as e:
@@ -344,40 +355,6 @@ async def get_treatment_recommendations(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Treatment recommendations failed: {str(e)}"
-        )
-
-
-@router.get(
-    "/stats",
-    status_code=status.HTTP_200_OK,
-    summary="Get system statistics",
-)
-async def get_system_stats(
-    service: DiagnosticService = Depends(get_diagnostic_service),
-):
-    """
-    Get statistics about the vector database and system
-    """
-    try:
-        stats = service.vector_store.get_collection_stats()
-        return {
-            "status": "operational",
-            "vector_database": stats,
-            "ai_assistant": "enabled",
-            "features": {
-                "vector_search": True,
-                "ai_explanations": True,
-                "follow_up_questions": True,
-                "medical_reports": True,
-                "treatment_recommendations": True
-            }
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to get stats: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get stats: {str(e)}"
         )
 
 
