@@ -5,7 +5,7 @@ This module provides JWT-based authentication, user management,
 and role-based access control for the Doctor-AI application.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 import secrets
 from jose import JWTError, jwt
@@ -90,7 +90,7 @@ class AuthService:
             status=UserStatus.ACTIVE,
             is_active=True,
             is_verified=True,  # Set to False if email verification is required
-            password_changed_at=datetime.utcnow(),
+            password_changed_at=datetime.now(timezone.utc),
         )
 
         self.db.add(user)
@@ -131,7 +131,7 @@ class AuthService:
             )
 
         # Check if account is locked
-        if user.locked_until and user.locked_until > datetime.utcnow():
+        if user.locked_until and user.locked_until > datetime.now(timezone.utc):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Account is locked until {user.locked_until.isoformat()}",
@@ -144,7 +144,7 @@ class AuthService:
 
             # Lock account after 5 failed attempts
             if user.failed_login_attempts >= 5:
-                user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=30)
 
             self.db.commit()
 
@@ -164,7 +164,7 @@ class AuthService:
         # Reset failed login attempts
         user.failed_login_attempts = 0
         user.locked_until = None
-        user.last_login_at = datetime.utcnow()
+        user.last_login_at = datetime.now(timezone.utc)
         self.db.commit()
 
         return user
@@ -191,7 +191,7 @@ class AuthService:
 
         # Calculate expiration
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        expires_at = datetime.utcnow() + expires_delta
+        expires_at = datetime.now(timezone.utc) + expires_delta
 
         # Create token payload
         payload = {
@@ -201,7 +201,7 @@ class AuthService:
             "role": user.role.value,
             "jti": jti,
             "exp": expires_at,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
         }
 
         # Encode token
@@ -261,7 +261,7 @@ class AuthService:
                     )
 
                 # Update last activity
-                session.last_activity_at = datetime.utcnow()
+                session.last_activity_at = datetime.now(timezone.utc)
                 self.db.commit()
 
             return payload
@@ -324,7 +324,7 @@ class AuthService:
 
         if session:
             session.is_active = False
-            session.revoked_at = datetime.utcnow()
+            session.revoked_at = datetime.now(timezone.utc)
             self.db.commit()
             return True
 
@@ -349,7 +349,7 @@ class AuthService:
         count = 0
         for session in sessions:
             session.is_active = False
-            session.revoked_at = datetime.utcnow()
+            session.revoked_at = datetime.now(timezone.utc)
             count += 1
 
         self.db.commit()
@@ -389,7 +389,7 @@ class AuthService:
 
         # Update password
         user.hashed_password = hash_password(new_password)
-        user.password_changed_at = datetime.utcnow()
+        user.password_changed_at = datetime.now(timezone.utc)
         self.db.commit()
 
         # Revoke all existing tokens

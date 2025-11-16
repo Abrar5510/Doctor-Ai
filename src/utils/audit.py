@@ -4,7 +4,7 @@ Audit logging for HIPAA compliance and regulatory requirements
 
 import json
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from uuid import uuid4
 from loguru import logger
@@ -80,7 +80,7 @@ class AuditLogger:
             filters_applied=[],
             hipaa_compliant=True,
             data_anonymized=self.settings.enable_data_anonymization,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         # Write to file
@@ -132,7 +132,7 @@ class AuditLogger:
             override_rationale=override_rationale,
             hipaa_compliant=True,
             data_anonymized=True,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         self._write_audit_log(audit_log)
@@ -177,7 +177,7 @@ class AuditLogger:
             accuracy_validated=accuracy_validated,
             hipaa_compliant=True,
             data_anonymized=True,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         self._write_audit_log(audit_log)

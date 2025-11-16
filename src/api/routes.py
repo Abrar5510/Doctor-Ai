@@ -141,32 +141,6 @@ async def get_condition(
         )
 
 
-@router.get(
-    "/stats",
-    status_code=status.HTTP_200_OK,
-    summary="Get system statistics",
-)
-async def get_system_stats(
-    service: DiagnosticService = Depends(get_diagnostic_service),
-):
-    """
-    Get statistics about the vector database and system
-
-    **Output**: Collection statistics, total conditions, etc.
-    """
-    try:
-        stats = service.vector_store.get_collection_stats()
-        return {
-            "status": "operational",
-            "vector_database": stats,
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to get stats: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get stats: {str(e)}"
-        )
 
 
 @router.post(

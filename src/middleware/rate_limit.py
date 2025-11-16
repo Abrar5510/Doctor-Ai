@@ -9,7 +9,7 @@ from fastapi import Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Dict, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import asyncio
 from collections import defaultdict
 
@@ -64,7 +64,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         Args:
             identifier: Client identifier
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         cutoff = now - timedelta(minutes=1)
 
         self.requests[identifier] = [
@@ -106,7 +106,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 # Calculate retry after time
                 if self.requests[identifier]:
                     oldest_request = min(self.requests[identifier])
-                    retry_after = int((oldest_request + timedelta(minutes=1) - datetime.utcnow()).total_seconds())
+                    retry_after = int((oldest_request + timedelta(minutes=1) - datetime.now(timezone.utc)).total_seconds())
                 else:
                     retry_after = 60
 
@@ -120,7 +120,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 )
 
             # Record this request
-            self.requests[identifier].append(datetime.utcnow())
+            self.requests[identifier].append(datetime.now(timezone.utc))
 
         # Process request
         response = await call_next(request)
@@ -132,7 +132,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response.headers["X-RateLimit-Limit"] = str(self.requests_per_minute)
         response.headers["X-RateLimit-Remaining"] = str(max(0, remaining))
         response.headers["X-RateLimit-Reset"] = str(
-            int((datetime.utcnow() + timedelta(minutes=1)).timestamp())
+            int((datetime.now(timezone.utc) + timedelta(minutes=1)).timestamp())
         )
 
         return response

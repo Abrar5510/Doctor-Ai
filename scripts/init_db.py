@@ -16,7 +16,7 @@ sys.path.insert(0, str(project_root))
 from src.database import init_db, SessionLocal
 from src.models.database import User, UserRole, UserStatus
 from src.utils.password import hash_password
-from datetime import datetime
+from datetime import datetime, timezone
 from loguru import logger
 
 
@@ -40,7 +40,7 @@ def create_default_admin():
             status=UserStatus.ACTIVE,
             is_active=True,
             is_verified=True,
-            password_changed_at=datetime.utcnow(),
+            password_changed_at=datetime.now(timezone.utc),
         )
 
         db.add(admin)
