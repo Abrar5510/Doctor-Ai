@@ -59,7 +59,11 @@ class AIReasoningAssistant:
             logger.info("AI Assistant initialized with local Llama2")
         else:
             self.client = None
-            logger.warning("AI Assistant running in mock mode (no API key)")
+            logger.error("AI Assistant not initialized: No API key provided and local mode not enabled")
+            raise ValueError(
+                "AI Assistant requires either an OpenAI API key or local LLM mode to be enabled. "
+                "Set OPENAI_API_KEY environment variable or enable USE_LOCAL_LLM."
+            )
 
     async def generate_detailed_explanation(
         self,
@@ -401,8 +405,10 @@ Create a comparison table or structured analysis."""
             LLM response text
         """
         if self.client is None:
-            # Mock response for testing without API key
-            return self._generate_mock_response(prompt)
+            raise RuntimeError(
+                "AI Assistant client not initialized. "
+                "This should not happen if initialization was successful."
+            )
 
         try:
             if not self.use_local:
@@ -441,28 +447,7 @@ Create a comparison table or structured analysis."""
 
         except Exception as e:
             logger.error(f"LLM call failed: {e}")
-            return f"Error generating AI response: {str(e)}"
-
-    def _generate_mock_response(self, prompt: str) -> str:
-        """Generate a mock response when no API key is available"""
-        if "follow-up questions" in prompt.lower():
-            return """1. How long have you experienced these symptoms?
-2. Have you noticed any triggers that make symptoms worse?
-3. Do you have a family history of similar conditions?
-4. Have you tried any treatments, and if so, what were the results?
-5. Are there any other symptoms you haven't mentioned yet?"""
-
-        elif "patient-friendly" in prompt.lower():
-            return """Based on your symptoms, our analysis suggests you may have a thyroid condition. This is a gland in your neck that controls your body's energy levels.
-
-When your thyroid isn't working properly, it can make you feel tired, cause weight changes, and affect how your body handles temperature. The good news is that this condition is very treatable.
-
-Your doctor will likely order some simple blood tests to check your thyroid levels. These tests will help confirm the diagnosis and determine the best treatment for you.
-
-Most people with thyroid conditions feel much better once they start treatment. It's important to follow up with your healthcare provider to discuss the results and next steps."""
-
-        else:
-            return """[AI Assistant Mock Mode] The patient presents with a constellation of symptoms consistent with the primary diagnosis. The symptom pattern shows strong alignment with typical presentation, with high vector similarity (>0.85) to established clinical patterns. Differential diagnoses have been appropriately considered and ranked based on symptom matching and clinical probability. Recommended diagnostic workup includes confirmatory laboratory studies and specialist consultation as indicated by the review tier assignment."""
+            raise RuntimeError("AI service temporarily unavailable. Please try again later.")
 
     def _format_diagnoses(self, diagnoses: List[DifferentialDiagnosis]) -> str:
         """Format diagnoses for prompt"""

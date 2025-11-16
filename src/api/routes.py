@@ -11,9 +11,12 @@ from ..models.schemas import (
     DiagnosticResult,
     MedicalCondition,
 )
+from ..models.database import User
 from ..services.diagnostic import DiagnosticService
 from ..services.ai_assistant import AIReasoningAssistant, ReportType
+from ..services.auth import get_current_user
 from ..utils.audit import AuditLogger
+from ..utils.sanitization import input_validator, sanitize_for_llm
 from ..config import get_settings
 
 # Create router
@@ -61,8 +64,7 @@ def get_audit_logger() -> AuditLogger:
 )
 async def analyze_patient_case(
     patient_case: PatientCase,
-    user_id: Optional[str] = None,
-    user_role: Optional[str] = "physician",
+    current_user: User = Depends(get_current_user),
     service: DiagnosticService = Depends(get_diagnostic_service),
     audit: AuditLogger = Depends(get_audit_logger),
 ):
@@ -90,17 +92,17 @@ async def analyze_patient_case(
         audit.log_diagnostic_analysis(
             case=patient_case,
             result=result,
-            user_id=user_id,
-            user_role=user_role,
+            user_id=str(current_user.id),
+            user_role=current_user.role.value,
         )
 
         return result
 
     except Exception as e:
-        logger.error(f"Diagnostic analysis failed: {e}")
+        logger.error(f"Diagnostic analysis failed for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Diagnostic analysis failed: {str(e)}"
+            detail="Diagnostic analysis failed. Please try again or contact support."
         )
 
 
@@ -112,6 +114,7 @@ async def analyze_patient_case(
 )
 async def get_condition(
     condition_id: str,
+    current_user: User = Depends(get_current_user),
     service: DiagnosticService = Depends(get_diagnostic_service),
 ):
     """
@@ -134,38 +137,10 @@ async def get_condition(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to retrieve condition: {e}")
+        logger.error(f"Failed to retrieve condition {condition_id} for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve condition: {str(e)}"
-        )
-
-
-@router.get(
-    "/stats",
-    status_code=status.HTTP_200_OK,
-    summary="Get system statistics",
-)
-async def get_system_stats(
-    service: DiagnosticService = Depends(get_diagnostic_service),
-):
-    """
-    Get statistics about the vector database and system
-
-    **Output**: Collection statistics, total conditions, etc.
-    """
-    try:
-        stats = service.vector_store.get_collection_stats()
-        return {
-            "status": "operational",
-            "vector_database": stats,
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to get stats: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get stats: {str(e)}"
+            detail="Failed to retrieve condition. Please try again or contact support."
         )
 
 
@@ -181,7 +156,7 @@ async def analyze_with_ai_enhancement(
     include_questions: bool = True,
     include_report: bool = False,
     report_type: ReportType = ReportType.PHYSICIAN_SUMMARY,
-    user_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
     service: DiagnosticService = Depends(get_diagnostic_service),
     ai: AIReasoningAssistant = Depends(get_ai_assistant),
     audit: AuditLogger = Depends(get_audit_logger),
@@ -235,17 +210,17 @@ async def analyze_with_ai_enhancement(
         audit.log_diagnostic_analysis(
             case=patient_case,
             result=result,
-            user_id=user_id,
-            user_role="physician",
+            user_id=str(current_user.id),
+            user_role=current_user.role.value,
         )
 
         return enhanced_result
 
     except Exception as e:
-        logger.error(f"Enhanced analysis failed: {e}")
+        logger.error(f"Enhanced analysis failed for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Enhanced analysis failed: {str(e)}"
+            detail="Enhanced analysis failed. Please try again or contact support."
         )
 
 
@@ -258,6 +233,7 @@ async def analyze_with_ai_enhancement(
 async def explain_in_simple_terms(
     condition_name: str,
     technical_explanation: str,
+    current_user: User = Depends(get_current_user),
     ai: AIReasoningAssistant = Depends(get_ai_assistant),
 ):
     """
@@ -269,6 +245,10 @@ async def explain_in_simple_terms(
     - Simplifying complex medical concepts
     """
     try:
+        # Validate and sanitize inputs
+        condition_name = input_validator.validate_condition_name(condition_name)
+        technical_explanation = sanitize_for_llm(technical_explanation, "technical explanation")
+
         simple_explanation = await ai.explain_in_simple_terms(
             condition_name,
             technical_explanation
@@ -281,10 +261,10 @@ async def explain_in_simple_terms(
         }
 
     except Exception as e:
-        logger.error(f"Explanation failed: {e}")
+        logger.error(f"Explanation failed for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Explanation failed: {str(e)}"
+            detail="Explanation generation failed. Please try again or contact support."
         )
 
 
@@ -300,6 +280,7 @@ async def get_treatment_recommendations(
     patient_age: int,
     patient_sex: str,
     confidence_score: float,
+    current_user: User = Depends(get_current_user),
     ai: AIReasoningAssistant = Depends(get_ai_assistant),
 ):
     """
@@ -314,6 +295,10 @@ async def get_treatment_recommendations(
     - Red flags to watch for
     """
     try:
+        # Validate inputs
+        diagnosis_name = input_validator.validate_condition_name(diagnosis_name)
+        patient_age = input_validator.validate_patient_age(patient_age)
+
         # Create minimal diagnosis object
         from ..models.schemas import DifferentialDiagnosis, UrgencyLevel
         diagnosis = DifferentialDiagnosis(
@@ -340,10 +325,10 @@ async def get_treatment_recommendations(
         return recommendations
 
     except Exception as e:
-        logger.error(f"Treatment recommendations failed: {e}")
+        logger.error(f"Treatment recommendations failed for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Treatment recommendations failed: {str(e)}"
+            detail="Treatment recommendations generation failed. Please try again or contact support."
         )
 
 
@@ -353,6 +338,7 @@ async def get_treatment_recommendations(
     summary="Get system statistics",
 )
 async def get_system_stats(
+    current_user: User = Depends(get_current_user),
     service: DiagnosticService = Depends(get_diagnostic_service),
 ):
     """
@@ -374,10 +360,10 @@ async def get_system_stats(
         }
 
     except Exception as e:
-        logger.error(f"Failed to get stats: {e}")
+        logger.error(f"Failed to get stats for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get stats: {str(e)}"
+            detail="Failed to retrieve system statistics. Please try again or contact support."
         )
 
 
@@ -386,13 +372,41 @@ async def get_system_stats(
     status_code=status.HTTP_200_OK,
     summary="Health check endpoint",
 )
-async def health_check():
+async def health_check(
+    service: DiagnosticService = Depends(get_diagnostic_service),
+):
     """
-    Simple health check endpoint
+    Health check endpoint that verifies service connectivity
     """
-    return {
+    health_status = {
         "status": "healthy",
         "service": "Medical Symptom Constellation Mapper",
         "version": "0.2.0",
-        "ai_features": "enabled"
+        "checks": {}
     }
+
+    try:
+        # Check vector database connectivity
+        try:
+            stats = service.vector_store.get_collection_stats()
+            health_status["checks"]["vector_database"] = "healthy"
+        except Exception as e:
+            logger.warning(f"Vector database health check failed: {e}")
+            health_status["checks"]["vector_database"] = "unhealthy"
+            health_status["status"] = "degraded"
+
+        # Check if diagnostic service is initialized
+        if service.vector_store is not None:
+            health_status["checks"]["diagnostic_service"] = "healthy"
+        else:
+            health_status["checks"]["diagnostic_service"] = "unhealthy"
+            health_status["status"] = "degraded"
+
+        return health_status
+
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Service health check failed"
+        )
