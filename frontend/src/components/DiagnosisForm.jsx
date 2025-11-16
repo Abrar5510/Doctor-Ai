@@ -40,7 +40,10 @@ function DiagnosisForm({ setResults, setLoading }) {
       const response = await apiClient.post('/api/v1/analyze', patientCase)
       setResults(response.data)
     } catch (error) {
-      console.error('Error getting diagnosis:', error)
+      // Log error details for development only (would be sent to monitoring service in production)
+      if (import.meta.env.DEV) {
+        console.error('Error getting diagnosis:', error)
+      }
       setResults({
         error: true,
         message: error.response?.data?.detail || 'Failed to get diagnosis. Please try again.',

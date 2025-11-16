@@ -27,8 +27,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      console.error('Unauthorized access')
+      // Handle unauthorized access - redirect to login or show message
+      // In production, this would trigger a redirect to login page or refresh token flow
+      if (import.meta.env.DEV) {
+        console.error('Unauthorized access - authentication required')
+      }
+      // Could dispatch to a global error handler or redirect here
     }
     return Promise.reject(error)
   }
