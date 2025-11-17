@@ -17,42 +17,14 @@ from ..services.ai_assistant import AIReasoningAssistant, ReportType
 from ..services.auth import get_current_user
 from ..utils.audit import AuditLogger
 from ..utils.sanitization import input_validator, sanitize_for_llm
-from ..config import get_settings
+from ..dependencies import (
+    get_diagnostic_service,
+    get_ai_assistant,
+    get_audit_logger,
+)
 
 # Create router
 router = APIRouter()
-
-# Global service instances
-diagnostic_service: Optional[DiagnosticService] = None
-ai_assistant: Optional[AIReasoningAssistant] = None
-audit_logger: Optional[AuditLogger] = None
-
-
-def get_diagnostic_service() -> DiagnosticService:
-    """Dependency to get diagnostic service"""
-    global diagnostic_service
-    if diagnostic_service is None:
-        diagnostic_service = DiagnosticService()
-        diagnostic_service.initialize()
-    return diagnostic_service
-
-
-def get_ai_assistant() -> AIReasoningAssistant:
-    """Dependency to get AI assistant"""
-    global ai_assistant
-    if ai_assistant is None:
-        settings = get_settings()
-        api_key = getattr(settings, 'openai_api_key', None)
-        ai_assistant = AIReasoningAssistant(api_key=api_key)
-    return ai_assistant
-
-
-def get_audit_logger() -> AuditLogger:
-    """Dependency to get audit logger"""
-    global audit_logger
-    if audit_logger is None:
-        audit_logger = AuditLogger()
-    return audit_logger
 
 
 @router.post(

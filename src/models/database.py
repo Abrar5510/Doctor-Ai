@@ -186,3 +186,156 @@ class APIKey(Base):
 
     def __repr__(self):
         return f"<APIKey(id={self.id}, name='{self.name}', active={self.is_active})>"
+
+
+class PatientCaseRecord(Base):
+    """Patient case record model for storing diagnostic cases."""
+
+    __tablename__ = "patient_cases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(String(100), unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # Patient demographics
+    patient_age = Column(Integer, nullable=False)
+    patient_sex = Column(String(20), nullable=False)
+    patient_ethnicity = Column(String(100), nullable=True)
+    patient_location = Column(String(255), nullable=True)
+
+    # Chief complaint
+    chief_complaint = Column(Text, nullable=False)
+
+    # Symptoms data (stored as JSON)
+    symptoms_json = Column(Text, nullable=False)  # JSON array of symptoms
+    medical_history_json = Column(Text, nullable=True)  # JSON array of medical history
+    family_history_json = Column(Text, nullable=True)  # JSON array of family history
+    medications_json = Column(Text, nullable=True)  # JSON array of current medications
+    allergies_json = Column(Text, nullable=True)  # JSON array of allergies
+
+    # Diagnostic results
+    top_diagnosis = Column(String(255), nullable=True)
+    confidence_score = Column(Integer, nullable=True)  # 0-100
+    review_tier = Column(Integer, nullable=True)  # 1-4
+    has_red_flags = Column(Boolean, default=False, nullable=False)
+    red_flags_json = Column(Text, nullable=True)  # JSON array of red flags detected
+
+    # Case metadata
+    status = Column(String(50), default="pending_review", nullable=False)  # pending_review, reviewed, confirmed, rejected
+    priority = Column(String(50), default="routine", nullable=False)  # routine, urgent, emergency
+    assigned_to_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    reviewed_at = Column(DateTime, nullable=True)
+
+    # Relationships
+    diagnoses = relationship("DiagnosisRecord", back_populates="case", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<PatientCaseRecord(id={self.id}, case_id='{self.case_id}', status='{self.status}')>"
+
+
+class DiagnosisRecord(Base):
+    """Individual diagnosis record for each differential diagnosis."""
+
+    __tablename__ = "diagnosis_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("patient_cases.id"), nullable=False)
+
+    # Diagnosis details
+    condition_id = Column(String(255), nullable=False, index=True)
+    condition_name = Column(String(500), nullable=False)
+    icd10_code = Column(String(20), nullable=True)
+    snomed_code = Column(String(50), nullable=True)
+
+    # Scores
+    similarity_score = Column(Integer, nullable=False)  # 0-100
+    confidence_score = Column(Integer, nullable=False)  # 0-100
+    probability = Column(Integer, nullable=False)  # 0-100
+    rank = Column(Integer, nullable=False)  # Position in differential (1-N)
+
+    # Classification
+    is_rare_disease = Column(Boolean, default=False, nullable=False)
+    urgency_level = Column(String(50), nullable=False)  # routine, urgent, emergency
+    specialty = Column(String(100), nullable=True)
+
+    # Evidence
+    matching_symptoms_json = Column(Text, nullable=True)  # JSON array
+    supporting_evidence_json = Column(Text, nullable=True)  # JSON array
+    distinguishing_features_json = Column(Text, nullable=True)  # JSON array
+
+    # Clinical metadata
+    typical_age_range = Column(String(50), nullable=True)
+    sex_predilection = Column(String(20), nullable=True)
+    prevalence = Column(String(50), nullable=True)
+
+    # Physician review
+    physician_confirmed = Column(Boolean, nullable=True)
+    physician_notes = Column(Text, nullable=True)
+    physician_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    case = relationship("PatientCaseRecord", back_populates="diagnoses")
+
+    def __repr__(self):
+        return f"<DiagnosisRecord(id={self.id}, condition='{self.condition_name}', rank={self.rank})>"
+
+
+class SystemMetrics(Base):
+    """System performance and usage metrics."""
+
+    __tablename__ = "system_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Metric details
+    metric_type = Column(String(100), nullable=False, index=True)  # query_latency, embedding_time, cache_hit_rate, etc.
+    metric_name = Column(String(255), nullable=False)
+    metric_value = Column(Integer, nullable=False)  # Store as integer (milliseconds, count, percentage * 100)
+    metric_unit = Column(String(50), nullable=False)  # ms, count, percentage, etc.
+
+    # Context
+    endpoint = Column(String(255), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    request_id = Column(String(100), nullable=True)
+
+    # Additional metadata
+    metadata_json = Column(Text, nullable=True)
+
+    # Timestamp
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    def __repr__(self):
+        return f"<SystemMetrics(id={self.id}, type='{self.metric_type}', value={self.metric_value})>"
+
+
+class CachedEmbedding(Base):
+    """Cache for vector embeddings to reduce computation."""
+
+    __tablename__ = "cached_embeddings"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Text that was embedded
+    text_hash = Column(String(64), unique=True, index=True, nullable=False)  # SHA-256 hash
+    text_content = Column(Text, nullable=False)
+
+    # Embedding data
+    embedding_json = Column(Text, nullable=False)  # JSON array of floats
+    embedding_model = Column(String(255), nullable=False)
+    vector_dimension = Column(Integer, nullable=False)
+
+    # Cache metadata
+    access_count = Column(Integer, default=1, nullable=False)
+    last_accessed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    def __repr__(self):
+        return f"<CachedEmbedding(id={self.id}, model='{self.embedding_model}', accesses={self.access_count})>"

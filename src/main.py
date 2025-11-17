@@ -11,6 +11,9 @@ from contextlib import asynccontextmanager
 from .config import get_settings
 from .api.routes import router
 from .api.auth_routes import router as auth_router
+from .api.case_history_routes import router as case_history_router
+from .api.monitoring_routes import router as monitoring_router
+from .api.export_routes import router as export_router
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.security import SecurityHeadersMiddleware
 
@@ -39,9 +42,21 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
     logger.info(f"Debug mode: {settings.debug}")
     logger.info(f"API prefix: {settings.api_prefix}")
+
+    # Initialize services on startup
+    from .dependencies import ServiceContainer
+    logger.info("Pre-initializing services...")
+    ServiceContainer.get_diagnostic_service()
+    ServiceContainer.get_ai_assistant()
+    ServiceContainer.get_audit_logger()
+    logger.success("All services pre-initialized successfully")
+
     yield
+
     # Shutdown
     logger.info("Shutting down application")
+    ServiceContainer.cleanup()
+    logger.success("Application shutdown complete")
 
 
 # Create FastAPI app
@@ -105,6 +120,7 @@ logger.info(f"CORS origins configured: {settings.get_cors_origins()}")
 app.include_router(
     auth_router,
     prefix=settings.api_prefix,
+    tags=["authentication"],
 )
 
 # Include API routes (diagnostic endpoints)
@@ -112,6 +128,27 @@ app.include_router(
     router,
     prefix=settings.api_prefix,
     tags=["diagnostic"],
+)
+
+# Include case history routes
+app.include_router(
+    case_history_router,
+    prefix=f"{settings.api_prefix}/history",
+    tags=["case-history"],
+)
+
+# Include monitoring routes
+app.include_router(
+    monitoring_router,
+    prefix=f"{settings.api_prefix}/monitoring",
+    tags=["monitoring"],
+)
+
+# Include export routes
+app.include_router(
+    export_router,
+    prefix=f"{settings.api_prefix}/export",
+    tags=["export"],
 )
 
 
