@@ -10,6 +10,10 @@ function DiagnosisForm({ setResults, setLoading }) {
     medicalHistory: '',
   })
 
+  const [useAiDiagnosis, setUseAiDiagnosis] = useState(false)
+  const [apiProvider, setApiProvider] = useState('openai') // 'openai' or 'openrouter'
+  const [apiKey, setApiKey] = useState('')
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -37,7 +41,20 @@ function DiagnosisForm({ setResults, setLoading }) {
           : [],
       }
 
-      const response = await apiClient.post('/api/v1/analyze', patientCase)
+      // Add AI diagnosis configuration if enabled
+      const requestConfig = {
+        headers: {}
+      }
+
+      if (useAiDiagnosis && apiKey) {
+        if (apiProvider === 'openai') {
+          requestConfig.headers['X-OpenAI-Key'] = apiKey
+        } else if (apiProvider === 'openrouter') {
+          requestConfig.headers['X-OpenRouter-Key'] = apiKey
+        }
+      }
+
+      const response = await apiClient.post('/api/v1/analyze', patientCase, requestConfig)
       setResults(response.data)
     } catch (error) {
       // Log error details for development only (would be sent to monitoring service in production)
@@ -125,6 +142,63 @@ function DiagnosisForm({ setResults, setLoading }) {
             placeholder="Any relevant medical history, medications, allergies..."
             rows="3"
           />
+        </div>
+
+        <div className="ai-diagnosis-section">
+          <div className="toggle-container">
+            <label className="toggle-label">
+              <span className="toggle-text">Enable AI-Powered Diagnosis</span>
+              <div className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={useAiDiagnosis}
+                  onChange={(e) => setUseAiDiagnosis(e.target.checked)}
+                />
+                <span className="slider"></span>
+              </div>
+            </label>
+            <p className="toggle-description">
+              Get enhanced diagnostic insights using advanced AI models
+            </p>
+          </div>
+
+          {useAiDiagnosis && (
+            <div className="api-key-container">
+              <div className="form-group">
+                <label htmlFor="apiProvider">AI Provider</label>
+                <select
+                  id="apiProvider"
+                  value={apiProvider}
+                  onChange={(e) => setApiProvider(e.target.value)}
+                  className="provider-select"
+                >
+                  <option value="openai">OpenAI (GPT-4)</option>
+                  <option value="openrouter">OpenRouter (Multiple Models)</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="apiKey">
+                  {apiProvider === 'openai' ? 'OpenAI' : 'OpenRouter'} API Key
+                </label>
+                <input
+                  type="password"
+                  id="apiKey"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder={`Enter your ${apiProvider === 'openai' ? 'OpenAI' : 'OpenRouter'} API key`}
+                  className="api-key-input"
+                />
+                <p className="api-key-hint">
+                  {apiProvider === 'openai' ? (
+                    <>Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Platform</a></>
+                  ) : (
+                    <>Get your API key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">OpenRouter</a></>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <button type="submit" className="submit-btn">
