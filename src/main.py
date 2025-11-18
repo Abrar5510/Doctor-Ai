@@ -14,6 +14,7 @@ from .api.auth_routes import router as auth_router
 from .api.case_history_routes import router as case_history_router
 from .api.monitoring_routes import router as monitoring_router
 from .api.export_routes import router as export_router
+from .api.dashboard_routes import router as dashboard_router
 from .middleware.rate_limit import RateLimitMiddleware
 from .middleware.security import SecurityHeadersMiddleware
 
@@ -149,6 +150,13 @@ app.include_router(
     export_router,
     prefix=f"{settings.api_prefix}/export",
     tags=["export"],
+)
+
+# Include dashboard routes
+app.include_router(
+    dashboard_router,
+    prefix=f"{settings.api_prefix}/dashboard",
+    tags=["dashboard"],
 )
 
 

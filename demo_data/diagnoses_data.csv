@@ -1,0 +1,63 @@
+diagnosis_id,case_id,condition_name,icd10_code,confidence_score,differential_rank,recommended_tests,recommended_specialists,red_flags,created_at
+DX001,CASE001,Acute Myocardial Infarction,I21.9,0.92,1,"ECG, Troponin levels, Cardiac catheterization","Cardiologist, Emergency Medicine","Chest pain with radiation, Shortness of breath",2024-01-15 09:35:00
+DX002,CASE001,Unstable Angina,I20.0,0.85,2,"ECG, Troponin levels, Stress test",Cardiologist,Chest pain,2024-01-15 09:35:00
+DX003,CASE001,Pulmonary Embolism,I26.9,0.72,3,"D-dimer, CT pulmonary angiography","Pulmonologist, Emergency Medicine",Shortness of breath,2024-01-15 09:35:00
+DX004,CASE002,Migraine with Aura,G43.1,0.94,1,"Clinical diagnosis, MRI if atypical",Neurologist,,2024-01-15 10:20:00
+DX005,CASE002,Tension Headache,G44.2,0.68,2,Clinical diagnosis,Primary Care,,2024-01-15 10:20:00
+DX006,CASE003,Lung Cancer,C34.9,0.78,1,"Chest X-ray, CT chest, Biopsy","Oncologist, Pulmonologist","Weight loss, Night sweats",2024-01-15 11:05:00
+DX007,CASE003,Tuberculosis,A15.9,0.75,2,"Sputum culture, Chest X-ray, TB skin test","Infectious Disease, Pulmonologist","Persistent cough, Night sweats",2024-01-15 11:05:00
+DX008,CASE003,Chronic Bronchitis,J42,0.65,3,"Chest X-ray, Spirometry",Pulmonologist,,2024-01-15 11:05:00
+DX009,CASE004,Rheumatoid Arthritis,M06.9,0.82,1,"RF, Anti-CCP, ESR, CRP, X-ray hands",Rheumatologist,,2024-01-15 11:50:00
+DX010,CASE004,Systemic Lupus Erythematosus,M32.9,0.76,2,"ANA, Anti-dsDNA, Complement levels",Rheumatologist,,2024-01-15 11:50:00
+DX011,CASE005,Measles,B05.9,0.88,1,"Clinical diagnosis, Measles IgM","Pediatrician, Infectious Disease",High fever with rash,2024-01-15 12:35:00
+DX012,CASE005,Scarlet Fever,A38,0.72,2,"Rapid strep test, Throat culture",Pediatrician,High fever,2024-01-15 12:35:00
+DX013,CASE006,Type 2 Diabetes Mellitus,E11.9,0.91,1,"Fasting glucose, HbA1c, Urinalysis",Endocrinologist,,2024-01-15 13:20:00
+DX014,CASE006,Hyperthyroidism,E05.9,0.68,2,"TSH, Free T4, T3",Endocrinologist,,2024-01-15 13:20:00
+DX015,CASE007,Acute Appendicitis,K35.8,0.89,1,"CT abdomen, CBC, Urinalysis","Surgeon, Emergency Medicine","Severe abdominal pain, Fever",2024-01-15 14:05:00
+DX016,CASE007,Acute Gastroenteritis,K52.9,0.65,2,"Clinical diagnosis, Stool culture",Primary Care,,2024-01-15 14:05:00
+DX017,CASE008,Alzheimer Disease,G30.9,0.74,1,"MRI brain, Cognitive testing, Neuropsychological evaluation","Neurologist, Geriatrician",,2024-01-15 14:50:00
+DX018,CASE008,Vascular Dementia,F01.5,0.71,2,"MRI brain, Cognitive testing","Neurologist, Geriatrician",,2024-01-15 14:50:00
+DX019,CASE009,Asthma Exacerbation,J45.9,0.93,1,"Spirometry, Peak flow, Chest X-ray","Pulmonologist, Allergist",,2024-01-15 15:35:00
+DX020,CASE009,Exercise-Induced Bronchoconstriction,J45.990,0.78,2,"Exercise challenge test, Spirometry",Pulmonologist,,2024-01-15 15:35:00
+DX021,CASE010,Congestive Heart Failure,I50.9,0.87,1,"Echocardiogram, BNP, Chest X-ray, ECG",Cardiologist,"Leg swelling, Shortness of breath",2024-01-15 16:20:00
+DX022,CASE010,Chronic Kidney Disease,N18.9,0.76,2,"Creatinine, BUN, eGFR, Urinalysis",Nephrologist,,2024-01-15 16:20:00
+DX023,CASE011,Hypothyroidism,E03.9,0.89,1,"TSH, Free T4",Endocrinologist,,2024-01-16 08:05:00
+DX024,CASE011,Chronic Fatigue Syndrome,G93.3,0.64,2,"Clinical diagnosis, Rule out other causes",Primary Care,,2024-01-16 08:05:00
+DX025,CASE012,Kidney Stone,N20.0,0.86,1,"CT abdomen, Urinalysis, CBC","Urologist, Emergency Medicine","Blood in urine, Flank pain",2024-01-16 08:50:00
+DX026,CASE012,Urinary Tract Infection,N39.0,0.73,2,"Urinalysis, Urine culture",Primary Care,,2024-01-16 08:50:00
+DX027,CASE013,Acute Angle-Closure Glaucoma,H40.2,0.84,1,"Eye pressure measurement, Ophthalmologic exam","Ophthalmologist, Emergency Medicine","Sudden vision loss, Eye pain",2024-01-16 09:35:00
+DX028,CASE013,Retinal Detachment,H33.0,0.81,2,"Dilated eye exam, Ultrasound eye","Ophthalmologist, Emergency Medicine",Sudden vision loss,2024-01-16 09:35:00
+DX029,CASE014,Acute Ischemic Stroke,I63.9,0.91,1,"CT head, MRI brain, ECG","Neurologist, Emergency Medicine","Confusion, Slurred speech, Weakness",2024-01-16 10:20:00
+DX030,CASE014,Transient Ischemic Attack,G45.9,0.82,2,"CT head, Carotid ultrasound, ECG","Neurologist, Emergency Medicine","Dizziness, Confusion",2024-01-16 10:20:00
+DX031,CASE015,Panic Disorder,F41.0,0.85,1,"Clinical diagnosis, ECG to rule out cardiac","Psychiatrist, Psychologist",,2024-01-16 11:05:00
+DX032,CASE015,Generalized Anxiety Disorder,F41.1,0.79,2,Clinical diagnosis,"Psychiatrist, Psychologist",,2024-01-16 11:05:00
+DX033,CASE016,Epiglottitis,J05.1,0.88,1,"Lateral neck X-ray, Direct laryngoscopy","Otolaryngologist, Emergency Medicine","Difficulty swallowing, Drooling, High fever",2024-01-16 11:50:00
+DX034,CASE016,Peritonsillar Abscess,J36,0.77,2,"Clinical exam, CT neck if needed","Otolaryngologist, Emergency Medicine","Severe sore throat, Difficulty swallowing",2024-01-16 11:50:00
+DX035,CASE017,Acanthosis Nigricans with Insulin Resistance,L83,0.86,1,"Fasting glucose, HbA1c, Insulin levels",Endocrinologist,,2024-01-16 12:35:00
+DX036,CASE017,Polycystic Ovary Syndrome,E28.2,0.72,2,"Pelvic ultrasound, Hormone levels","Endocrinologist, Gynecologist",,2024-01-16 12:35:00
+DX037,CASE018,Benign Prostatic Hyperplasia,N40.0,0.88,1,"PSA, Urinalysis, Digital rectal exam",Urologist,,2024-01-16 13:20:00
+DX038,CASE018,Prostate Cancer,C61,0.68,2,"PSA, Digital rectal exam, Biopsy if indicated",Urologist,,2024-01-16 13:20:00
+DX039,CASE019,Early Pregnancy,Z33.1,0.92,1,"Pregnancy test, Ultrasound, HCG levels","Obstetrician, Gynecologist",,2024-01-16 14:05:00
+DX040,CASE019,Threatened Abortion,O20.0,0.71,2,"Ultrasound, HCG levels","Obstetrician, Emergency Medicine",,2024-01-16 14:05:00
+DX041,CASE020,Parkinson Disease,G20,0.79,1,"Clinical diagnosis, DaTscan if needed",Neurologist,,2024-01-16 14:50:00
+DX042,CASE020,Essential Tremor,G25.0,0.72,2,Clinical diagnosis,Neurologist,,2024-01-16 14:50:00
+DX043,CASE021,Endometriosis,N80.9,0.83,1,"Pelvic ultrasound, Laparoscopy",Gynecologist,,2024-01-17 08:35:00
+DX044,CASE021,Uterine Fibroids,D25.9,0.76,2,"Pelvic ultrasound, MRI pelvis",Gynecologist,,2024-01-17 08:35:00
+DX045,CASE022,Acute Lymphoblastic Leukemia,C91.0,0.73,1,"CBC, Bone marrow biopsy, Flow cytometry","Oncologist, Hematologist","Fatigue, Easy bruising",2024-01-17 09:20:00
+DX046,CASE022,Aplastic Anemia,D61.9,0.69,2,"CBC, Bone marrow biopsy",Hematologist,"Fatigue, Easy bruising",2024-01-17 09:20:00
+DX047,CASE023,Multiple Myeloma,C90.0,0.77,1,"Serum protein electrophoresis, Bone marrow biopsy, X-ray skeletal survey","Oncologist, Hematologist","Bone pain, Recurrent infections",2024-01-17 10:05:00
+DX048,CASE023,Metastatic Bone Disease,C79.5,0.71,2,"CT chest/abdomen/pelvis, Bone scan, Biopsy",Oncologist,Bone pain,2024-01-17 10:05:00
+DX049,CASE024,Lung Cancer,C34.9,0.84,1,"Chest X-ray, CT chest, Bronchoscopy with biopsy","Oncologist, Pulmonologist","Cough with blood, Weight loss",2024-01-17 10:50:00
+DX050,CASE024,Tuberculosis,A15.0,0.76,2,"Sputum culture, Chest X-ray, TB skin test","Infectious Disease, Pulmonologist",Cough with blood,2024-01-17 10:50:00
+DX051,CASE025,Post-Traumatic Seizure,G40.9,0.81,1,"MRI brain, EEG, CT head","Neurologist, Emergency Medicine",Seizure after head injury,2024-01-17 11:35:00
+DX052,CASE025,Subdural Hematoma,I62.0,0.78,2,"CT head, MRI brain","Neurosurgeon, Emergency Medicine","Headache, Confusion after head injury",2024-01-17 11:35:00
+DX053,CASE026,Alcoholic Hepatitis,K70.1,0.84,1,"LFTs, Hepatitis panel, Ultrasound liver","Gastroenterologist, Hepatologist","Yellow skin, Abdominal pain",2024-01-17 12:20:00
+DX054,CASE026,Cholangitis,K83.0,0.74,2,"LFTs, Ultrasound, MRCP","Gastroenterologist, Surgeon","Yellow skin, Fever, Abdominal pain",2024-01-17 12:20:00
+DX055,CASE027,Subarachnoid Hemorrhage,I60.9,0.89,1,"CT head, Lumbar puncture if CT negative, CT angiography","Neurosurgeon, Emergency Medicine","Sudden severe headache, Neck stiffness",2024-01-17 13:05:00
+DX056,CASE027,Meningitis,G03.9,0.82,2,"Lumbar puncture, Blood cultures, CT head","Neurologist, Infectious Disease, Emergency Medicine","Severe headache, Neck stiffness, Sensitivity to light",2024-01-17 13:05:00
+DX057,CASE028,Alzheimer Disease,G30.9,0.76,1,"MRI brain, Cognitive testing, Neuropsychological evaluation","Neurologist, Geriatrician",,2024-01-17 13:50:00
+DX058,CASE028,Vascular Dementia,F01.5,0.73,2,"MRI brain, Cognitive testing","Neurologist, Geriatrician",,2024-01-17 13:50:00
+DX059,CASE029,Type 1 Diabetes Mellitus,E10.9,0.93,1,"Fasting glucose, HbA1c, C-peptide, Autoantibodies",Endocrinologist,"Extreme thirst, Weight loss",2024-01-17 14:35:00
+DX060,CASE029,Diabetic Ketoacidosis,E10.1,0.85,2,"Blood glucose, Arterial blood gas, Electrolytes, Ketones","Endocrinologist, Emergency Medicine","Extreme thirst, Frequent urination",2024-01-17 14:35:00
+DX061,CASE030,Systemic Lupus Erythematosus,M32.9,0.88,1,"ANA, Anti-dsDNA, Complement levels, CBC, Urinalysis",Rheumatologist,,2024-01-17 15:20:00
+DX062,CASE030,Dermatomyositis,M33.9,0.71,2,"Muscle enzymes, EMG, Muscle biopsy, ANA",Rheumatologist,,2024-01-17 15:20:00

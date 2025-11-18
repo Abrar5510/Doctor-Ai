@@ -9,6 +9,7 @@ An AI-powered diagnostic support system that maps patient symptoms to potential 
 
 ## 🌟 Features
 
+### Core Diagnostic Features
 - **Vector Similarity Search**: Semantic understanding of symptom relationships using BioBERT/PubMedBERT embeddings
 - **Rare Disease Detection**: Comprehensive orphan disease coverage and pattern recognition
 - **Multi-tier Review System**: Confidence-based routing to appropriate care levels
@@ -16,6 +17,23 @@ An AI-powered diagnostic support system that maps patient symptoms to potential 
 - **Explainable AI**: Complete transparency in diagnostic reasoning
 - **HIPAA Compliant**: Full audit trail and data anonymization
 - **Clinical Decision Support**: Evidence-based recommendations for tests and specialists
+
+### NEW: Dashboard & Analytics 📊
+- **Admin Dashboard**: Beautiful, investor-ready analytics dashboard with real-time metrics
+- **Interactive Visualizations**: Charts for tier distribution, top conditions, demographics, and performance
+- **Demo Data Included**: 30+ realistic patient cases with 62 diagnoses ready for demonstration
+- **Performance Monitoring**: System metrics tracking with 14 days of sample data
+
+### NEW: Modern Frontend 🎨
+- **Landing Page**: Impressive, modern landing page for investors and judges
+- **React 18 + Vite**: Fast, modern frontend with beautiful gradients and animations
+- **Responsive Design**: Mobile-friendly interface with smooth transitions
+- **Multiple Routes**: Landing page, diagnosis tool, and analytics dashboard
+
+### NEW: Cloud Deployment ☁️
+- **Render Support**: One-click deployment with included `render.yaml`
+- **Production Ready**: Full deployment guide with environment configuration
+- **Scalable Architecture**: Docker containers, caching, and async processing
 
 ## 📋 Table of Contents
 
@@ -162,13 +180,38 @@ Or using uvicorn directly:
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. Access the API Documentation
+### 3. Start the Frontend (NEW!)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend will be available at http://localhost:3000
+
+**Available Routes:**
+- **/** - Beautiful landing page with feature showcase
+- **/dashboard** - Admin dashboard with analytics and metrics
+- **/diagnose** - Diagnosis tool for symptom analysis
+
+### 4. Access the API Documentation
 
 Open your browser and navigate to:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+- Dashboard: http://localhost:3000/dashboard
 
-### 4. Test the API
+### 5. View Demo Data
+
+The application includes realistic demo data:
+- `demo_data/sample_patient_cases.csv` - 30 patient cases
+- `demo_data/diagnoses_data.csv` - 62 differential diagnoses
+- `demo_data/system_metrics.csv` - 14 days of performance metrics
+
+Access the dashboard at http://localhost:3000/dashboard to visualize this data!
+
+### 6. Test the API
 
 ```bash
 python scripts/test_api.py
@@ -432,6 +475,30 @@ docker build -t doctor-ai:latest .
 ```bash
 docker-compose up -d
 ```
+
+### Render Deployment (NEW! ☁️)
+
+We've included one-click deployment to Render.com:
+
+1. **One-Click Deploy:**
+   - Push this repository to GitHub
+   - Go to [Render Dashboard](https://render.com/dashboard)
+   - Click "New" → "Blueprint"
+   - Connect your repository
+   - Click "Apply"
+
+2. **Manual Setup:**
+   - See detailed guide in `RENDER_DEPLOYMENT.md`
+   - Includes configuration for:
+     - Backend API (Python/FastAPI)
+     - Frontend (Static site)
+     - PostgreSQL database
+   - Free tier available (~$14/month for starter)
+
+3. **Demo Guide:**
+   - See `DEMO_GUIDE.md` for investor/judge presentation
+   - Includes sample data and talking points
+   - Performance metrics and key features highlighted
 
 ### Production Considerations
 
