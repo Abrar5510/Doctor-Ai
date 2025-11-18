@@ -1,9 +1,6 @@
 {
   "version": 2,
   "name": "doctor-ai-backend",
-  "env": {
-    "PIP_CONSTRAINT": "constraints.txt"
-  },
   "builds": [
     {
       "src": "api/index.py",
