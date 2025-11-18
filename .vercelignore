@@ -1,11 +1,17 @@
-# Python backend (not deployed to Vercel)
+# Python backend source (not deployed to Vercel)
 /src/
 /tests/
 /alembic/
 /scripts/
-*.py
-requirements.txt
-runtime.txt
+
+# But keep API folder - it's needed!
+# !/api/
+
+# Keep requirements for API lambdas
+# requirements.txt is needed by Vercel Python
+# runtime.txt is needed by Vercel Python
+
+# Build tools
 alembic.ini
 pyproject.toml
 
@@ -36,7 +42,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -49,6 +54,8 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Note: frontend/dist is needed for deployment, so don't exclude it
 
 # IDEs
 .vscode/
