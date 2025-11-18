@@ -1,24 +1,33 @@
 # ============================================================================
-# Doctor AI - Render Blueprint
+# Doctor AI - Render Blueprint (100% FREE Deployment)
 # ============================================================================
 # This blueprint deploys the complete Doctor AI Medical Symptom Mapper stack
+# entirely for FREE using Render's free tier + external free services.
 #
-# What gets deployed:
-# - Backend API (FastAPI + ML models)
-# - Frontend (React + Vite)
-# - PostgreSQL Database
+# What gets deployed on Render (FREE):
+# - Backend API (FastAPI + ML models) - FREE tier
+# - Frontend (React + Vite) - FREE static hosting
 #
-# Additional services (require external setup or paid plans):
-# - Qdrant Vector DB: Use Qdrant Cloud (https://cloud.qdrant.io/)
-# - Redis Cache: Use Redis Cloud (https://redis.com/cloud/overview/)
+# External FREE services you'll need to set up (5 minutes):
+# - PostgreSQL Database: Neon.tech (FREE 3GB) or Supabase (FREE 500MB)
+# - Qdrant Vector DB: Qdrant Cloud (FREE 1GB) - Optional
+# - Redis Cache: Upstash (FREE 10K req/day) - Optional
 #
-# Deployment:
+# Quick Start (FREE Deployment):
 # 1. Fork/push this repo to GitHub
 # 2. Go to https://render.com/dashboard
 # 3. Click "New" → "Blueprint"
-# 4. Connect your repository
-# 5. Add required secrets (OPENAI_API_KEY, etc.)
-# 6. Click "Apply"
+# 4. Connect your repository and click "Apply"
+# 5. Sign up for free database at https://neon.tech/
+# 6. Add DATABASE_URL to backend environment in Render
+# 7. Done! Your app is running 100% FREE 🎉
+#
+# Total Cost: $0/month (FREE tier with limitations)
+#
+# Limitations:
+# - Services spin down after 15 min inactivity (30-60s wake up time)
+# - 512MB RAM (may struggle with large ML models)
+# - Perfect for demos, testing, and personal projects
 #
 # Documentation: See RENDER_DEPLOYMENT.md for detailed instructions
 # ============================================================================
@@ -34,7 +43,7 @@ services:
     name: doctor-ai-backend
     runtime: python
     region: oregon
-    plan: starter  # Upgrade to 'standard' for production (2GB RAM recommended for ML models)
+    plan: free  # Free tier with limitations (512MB RAM, spins down after 15 min inactivity)
     branch: main
 
     # Build Configuration
@@ -108,11 +117,14 @@ services:
         value: 60
 
       # ===== Database Configuration =====
-      # Automatically connects to the PostgreSQL database defined below
+      # IMPORTANT: Add your free database URL from one of these providers:
+      # - Neon: https://neon.tech/ (Free tier: 3GB storage)
+      # - Supabase: https://supabase.com/ (Free tier: 500MB database)
+      # - ElephantSQL: https://www.elephantsql.com/ (Free tier: 20MB)
+      # - Render PostgreSQL: https://render.com (Paid: starts at $7/month)
+      # Format: postgresql://username:password@host:port/database
       - key: DATABASE_URL
-        fromDatabase:
-          name: doctor-ai-db
-          property: connectionString
+        sync: false  # Must be added manually in Render dashboard
 
       - key: DATABASE_ECHO
         value: false
@@ -266,89 +278,98 @@ services:
           envVarKey: RENDER_EXTERNAL_URL
 
 # ============================================================================
-# Databases
+# External Services (Required for FREE Deployment)
 # ============================================================================
-
-databases:
-  # ==========================================================================
-  # PostgreSQL Database
-  # ==========================================================================
-  # Primary database for application data, user accounts, and medical records
-  # ==========================================================================
-  - name: doctor-ai-db
-    databaseName: doctor_ai
-    user: doctor_ai_user
-    region: oregon
-    # Note: Render will use the default paid plan (starts at $7/month)
-    # Includes 1GB storage and automatic daily backups
-    # Upgrade options available in Render dashboard for more storage/features
-
-    ipAllowList: []  # Empty = allow connections from all Render services
-
-    # Automatic daily backups included with all paid plans
-    # Backup retention varies by plan tier
-
-# ============================================================================
-# Additional Services (External)
-# ============================================================================
-# The following services are not included in this blueprint and require
-# external setup:
+# For a completely FREE deployment, you need to set up these external services:
 #
-# 1. Qdrant Vector Database (for semantic search)
-#    - Option A: Qdrant Cloud - https://cloud.qdrant.io/
+# 1. PostgreSQL Database (REQUIRED) - Choose one FREE option:
+#    - Neon (RECOMMENDED) - https://neon.tech/
+#      * Free tier: 3GB storage, 1 project
+#      * Serverless PostgreSQL, no cold starts
+#      * Sign up → Create project → Copy connection string
+#
+#    - Supabase - https://supabase.com/
+#      * Free tier: 500MB database, 2GB bandwidth
+#      * Includes auth, storage, and realtime features
+#      * Sign up → Create project → Get DATABASE_URL
+#
+#    - ElephantSQL - https://www.elephantsql.com/
+#      * Free tier: 20MB storage (limited but works for testing)
+#      * Easy setup, reliable
+#      * Sign up → Create instance → Copy URL
+#
+#    After getting your database URL, add it to backend environment:
+#    DATABASE_URL = postgresql://username:password@host:port/database
+#
+# 2. Qdrant Vector Database (OPTIONAL - for semantic search)
+#    - Qdrant Cloud - https://cloud.qdrant.io/
 #      * Free tier: 1GB storage, 100K vectors
-#      * Starter: $25/month
-#    - Option B: Self-hosted on Render (requires Private Service)
 #      * Add QDRANT_HOST and QDRANT_API_KEY to backend env vars
 #
-# 2. Redis Cache (for performance)
-#    - Option A: Redis Cloud - https://redis.com/cloud/overview/
-#      * Free tier: 30MB
-#      * Starter: $5/month for 250MB
-#    - Option B: Upstash Redis - https://upstash.com/
-#      * Free tier: 10K requests/day
-#    - Add REDIS_HOST, REDIS_PORT, REDIS_PASSWORD to backend env vars
+# 3. Redis Cache (OPTIONAL - for performance)
+#    - Upstash Redis - https://upstash.com/
+#      * Free tier: 10K requests/day, 256MB storage
+#      * Add REDIS_HOST, REDIS_PORT, REDIS_PASSWORD to backend env vars
 #
-# 3. OpenAI API (for AI assistant)
+#    - Redis Cloud - https://redis.com/cloud/overview/
+#      * Free tier: 30MB
+#
+# 4. OpenAI API (OPTIONAL - for AI assistant features)
 #    - Sign up: https://platform.openai.com/
 #    - Add OPENAI_API_KEY to backend env vars
+#    - Note: OpenAI charges per usage (not subscription)
 #
 # ============================================================================
 
 # ============================================================================
-# Post-Deployment Steps
+# Post-Deployment Steps (For FREE Setup)
 # ============================================================================
 # After deploying this blueprint:
 #
-# 1. ✅ Add OPENAI_API_KEY to backend environment variables
-#    - Go to doctor-ai-backend → Environment
-#    - Add: OPENAI_API_KEY = your-key-here
+# 1. ✅ Set up a FREE PostgreSQL database (REQUIRED)
+#    - Go to Neon.tech (recommended) or Supabase/ElephantSQL
+#    - Sign up for free account
+#    - Create a new database/project
+#    - Copy the connection string (DATABASE_URL)
+#    - In Render dashboard:
+#      * Go to doctor-ai-backend → Environment
+#      * Add: DATABASE_URL = your-postgresql-connection-string
+#    - Redeploy the backend service
 #
 # 2. ✅ Update CORS_ORIGINS with your frontend URL
 #    - Wait for frontend to deploy
-#    - Copy the frontend URL
-#    - Update backend CORS_ORIGINS to include it
+#    - Copy the frontend URL (e.g., https://doctor-ai-frontend.onrender.com)
+#    - Go to backend → Environment
+#    - Update CORS_ORIGINS to include your frontend URL
+#    - Redeploy backend
 #
-# 3. ✅ (Optional) Set up Qdrant Cloud for vector search
-#    - Sign up at https://cloud.qdrant.io/
+# 3. ✅ (Optional) Add OPENAI_API_KEY for AI assistant features
+#    - Get API key from https://platform.openai.com/
+#    - Add: OPENAI_API_KEY = your-key-here
+#
+# 4. ✅ (Optional) Set up Qdrant Cloud FREE tier for vector search
+#    - Sign up at https://cloud.qdrant.io/ (free tier available)
 #    - Create a cluster
 #    - Add QDRANT_HOST and QDRANT_API_KEY to backend
 #
-# 4. ✅ (Optional) Set up Redis for caching
-#    - Sign up at https://redis.com/cloud/overview/
+# 5. ✅ (Optional) Set up Upstash Redis FREE tier for caching
+#    - Sign up at https://upstash.com/ (free tier available)
 #    - Create a database
 #    - Add REDIS_HOST, REDIS_PORT, REDIS_PASSWORD to backend
 #
-# 5. ✅ Test your deployment
+# 6. ✅ Test your deployment
 #    - Backend health: https://your-backend.onrender.com/api/v1/monitoring/health
 #    - API docs: https://your-backend.onrender.com/docs
 #    - Frontend: https://your-frontend.onrender.com
 #    - Dashboard: https://your-frontend.onrender.com/dashboard
 #
-# 6. ✅ Monitor your application
+# 7. ✅ Monitor your application
 #    - Check logs in Render dashboard
 #    - Monitor metrics at /api/v1/monitoring/metrics
 #    - Review dashboard analytics
+#
+# Note: Free tier services spin down after 15 minutes of inactivity.
+# First request after inactivity may take 30-60 seconds to wake up.
 #
 # ============================================================================
 
@@ -356,24 +377,38 @@ databases:
 # Cost Estimate
 # ============================================================================
 #
-# Minimal Setup (Demo/Testing):
-# - PostgreSQL (Basic):        $7/month
-# - Backend Starter (512MB):   $7/month
-# - Frontend Static:           FREE
-# - Total:                     ~$14/month
+# 🆓 FREE Setup (Recommended for Testing/Personal Projects):
+# - Render Backend (Free):     FREE (with limitations)
+# - Render Frontend:           FREE
+# - Neon PostgreSQL:           FREE (3GB storage)
+# - Qdrant Cloud:              FREE (optional, 1GB)
+# - Upstash Redis:             FREE (optional, 10K req/day)
+# - Total:                     $0/month 🎉
 #
-# Recommended Setup (Production):
-# - PostgreSQL (Standard):     $20/month
-# - Backend Standard (2GB):    $25/month
-# - Frontend Static:           FREE
-# - Qdrant Cloud Starter:      $25/month
-# - Redis Cloud Starter:       $5/month
-# - Total:                     ~$75/month
+# Limitations of FREE tier:
+# - Services spin down after 15 min inactivity (30-60s cold start)
+# - 512MB RAM (may struggle with large ML models)
+# - Limited build minutes
+# - Suitable for demos, testing, and low-traffic apps
+#
+# Minimal Paid Setup (Demo/Small Production):
+# - Render Backend Starter:    $7/month (no cold starts, more reliable)
+# - Render Frontend:           FREE
+# - Neon/Supabase DB:          FREE or $7/month for more storage
+# - Total:                     $7-14/month
+#
+# Recommended Production Setup:
+# - Render Backend Standard:   $25/month (2GB RAM for ML models)
+# - Render Frontend:           FREE
+# - PostgreSQL (paid):         $20/month (more storage/backups)
+# - Qdrant Cloud Starter:      $25/month (optional)
+# - Redis Cloud Starter:       $5/month (optional)
+# - Total:                     ~$45-75/month
 #
 # Enterprise Setup:
-# - PostgreSQL (Pro):          $90/month
-# - Backend Pro (4GB+):        $85/month
-# - Frontend Static:           FREE
+# - Render Backend Pro:        $85/month (4GB+ RAM)
+# - Render Frontend:           FREE
+# - PostgreSQL Pro:            $90/month
 # - Qdrant Cloud Growth:       $95/month
 # - Redis Cloud Pro:           $15/month
 # - Total:                     ~$285/month
@@ -384,30 +419,45 @@ databases:
 # Troubleshooting
 # ============================================================================
 #
-# Service won't start:
-# - Check environment variables are set correctly
-# - Review logs in Render dashboard
-# - Verify DATABASE_URL is connecting
-# - Ensure sufficient memory (upgrade plan if needed)
+# Service is slow / times out:
+# - FREE tier services sleep after 15 min inactivity
+# - First request takes 30-60 seconds to wake up
+# - Solution: Upgrade to paid plan ($7/month) for no cold starts
+# - Or: Use a service like UptimeRobot to ping your app every 14 min
+#
+# Service won't start / DATABASE_URL error:
+# - Make sure you added DATABASE_URL to backend environment variables
+# - Get free database from Neon.tech, Supabase, or ElephantSQL
+# - Check the connection string format: postgresql://user:pass@host:port/db
+# - Review logs in Render dashboard for specific errors
 #
 # Frontend can't connect to backend:
-# - Verify VITE_API_URL is set correctly
-# - Check CORS_ORIGINS includes frontend URL
+# - Verify VITE_API_URL is set correctly (should auto-populate)
+# - Check CORS_ORIGINS includes your frontend URL
 # - Test backend health endpoint directly
+# - Wait for services to wake up if on free tier
 #
-# ML model errors:
-# - Upgrade to Standard plan (2GB RAM minimum)
-# - Check internet connectivity for model downloads
-# - Review transformers library installation
+# ML model errors / Out of memory:
+# - Free tier has only 512MB RAM (BioBERT model needs ~420MB)
+# - May fail with large requests or multiple simultaneous users
+# - Solution: Upgrade to Starter ($7/month) or Standard plan ($25/month)
+# - Or: Use lighter embedding models
 #
 # Database connection issues:
-# - Verify using internal database URL
-# - Check database service is running
-# - Review database credentials
+# - Verify DATABASE_URL is correct in Render dashboard
+# - Check external database service (Neon/Supabase) is running
+# - Ensure database allows external connections
+# - Review database credentials and host
+#
+# Build fails:
+# - Free tier has limited build minutes
+# - Check requirements.txt for conflicting dependencies
+# - Review build logs in Render dashboard
 #
 # For more help:
 # - Documentation: See RENDER_DEPLOYMENT.md
 # - Render Docs: https://render.com/docs
 # - Community: https://community.render.com
+# - Neon Docs: https://neon.tech/docs
 #
 # ============================================================================
