@@ -50,7 +50,6 @@
   "regions": ["iad1"],
   "env": {
     "ENVIRONMENT": "production",
-    "DATABASE_URL": "@database_url",
     "SECRET_KEY": "@secret_key",
     "OPENAI_API_KEY": "@openai_api_key",
     "QDRANT_HOST": "@qdrant_host",
