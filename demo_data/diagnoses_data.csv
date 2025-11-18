@@ -61,3 +61,43 @@ DX059,CASE029,Type 1 Diabetes Mellitus,E10.9,0.93,1,"Fasting glucose, HbA1c, C-p
 DX060,CASE029,Diabetic Ketoacidosis,E10.1,0.85,2,"Blood glucose, Arterial blood gas, Electrolytes, Ketones","Endocrinologist, Emergency Medicine","Extreme thirst, Frequent urination",2024-01-17 14:35:00
 DX061,CASE030,Systemic Lupus Erythematosus,M32.9,0.88,1,"ANA, Anti-dsDNA, Complement levels, CBC, Urinalysis",Rheumatologist,,2024-01-17 15:20:00
 DX062,CASE030,Dermatomyositis,M33.9,0.71,2,"Muscle enzymes, EMG, Muscle biopsy, ANA",Rheumatologist,,2024-01-17 15:20:00
+DX063,CASE031,Acute Myocardial Infarction,I21.9,0.95,1,"ECG, Troponin, Cardiac catheterization","Cardiologist, Emergency Medicine","Chest pressure, Jaw pain, Sweating",2024-01-18 08:35:00
+DX064,CASE031,Unstable Angina,I20.0,0.87,2,"ECG, Troponin, Stress test",Cardiologist,Chest pressure,2024-01-18 08:35:00
+DX065,CASE032,Acute Ischemic Stroke,I63.9,0.93,1,"CT head, MRI brain, ECG","Neurologist, Emergency Medicine","Sudden numbness, Facial drooping, Slurred speech",2024-01-18 09:20:00
+DX066,CASE032,Transient Ischemic Attack,G45.9,0.84,2,"CT head, Carotid ultrasound","Neurologist, Emergency Medicine","Sudden numbness, Neurological deficits",2024-01-18 09:20:00
+DX067,CASE033,Lumbar Disc Herniation,M51.2,0.88,1,"MRI lumbar spine, Physical exam",Orthopedist,,2024-01-18 10:05:00
+DX068,CASE033,Spinal Stenosis,M48.0,0.76,2,"MRI lumbar spine, X-ray spine",Orthopedist,,2024-01-18 10:05:00
+DX069,CASE034,Recurrent Urinary Tract Infection,N39.0,0.89,1,"Urinalysis, Urine culture, Renal ultrasound","Urologist, Primary Care",,2024-01-18 10:50:00
+DX070,CASE034,Interstitial Cystitis,N30.1,0.71,2,"Cystoscopy, Urinalysis",Urologist,,2024-01-18 10:50:00
+DX071,CASE035,Acute Gout Flare,M10.9,0.91,1,"Joint aspiration, Uric acid level, X-ray",Rheumatologist,Severe joint pain,2024-01-18 11:35:00
+DX072,CASE035,Septic Arthritis,M00.9,0.74,2,"Joint aspiration, Blood cultures","Rheumatologist, Infectious Disease",Red hot joint,2024-01-18 11:35:00
+DX073,CASE036,Gastroesophageal Reflux Disease,K21.9,0.87,1,"Upper endoscopy, pH monitoring","Gastroenterologist, Primary Care",,2024-01-18 12:20:00
+DX074,CASE036,Esophageal Stricture,K22.2,0.69,2,"Upper endoscopy, Barium swallow",Gastroenterologist,,2024-01-18 12:20:00
+DX075,CASE037,Supraventricular Tachycardia,I47.1,0.83,1,"ECG, Holter monitor, Echocardiogram",Cardiologist,,2024-01-18 13:05:00
+DX076,CASE037,Atrial Fibrillation,I48.9,0.78,2,"ECG, Holter monitor, Echocardiogram",Cardiologist,,2024-01-18 13:05:00
+DX077,CASE038,Normal Pressure Hydrocephalus,G91.2,0.81,1,"MRI brain, Lumbar puncture","Neurosurgeon, Neurologist",,2024-01-18 13:50:00
+DX078,CASE038,Vascular Dementia,F01.5,0.76,2,"MRI brain, Cognitive testing","Neurologist, Geriatrician",,2024-01-18 13:50:00
+DX079,CASE039,Ulcerative Colitis,K51.9,0.86,1,"Colonoscopy, Biopsy, Inflammatory markers",Gastroenterologist,,2024-01-18 14:35:00
+DX080,CASE039,Crohn Disease,K50.9,0.82,2,"Colonoscopy, CT enterography, Inflammatory markers",Gastroenterologist,,2024-01-18 14:35:00
+DX081,CASE040,Chronic Sinusitis,J32.9,0.84,1,"CT sinuses, Nasal endoscopy","Otolaryngologist, Primary Care",,2024-01-18 15:20:00
+DX082,CASE040,Nasal Polyps,J33.9,0.73,2,"Nasal endoscopy, CT sinuses",Otolaryngologist,,2024-01-18 15:20:00
+DX083,CASE041,Uterine Fibroids,D25.9,0.85,1,"Pelvic ultrasound, MRI pelvis",Gynecologist,,2024-01-19 08:35:00
+DX084,CASE041,Endometrial Hyperplasia,N85.0,0.77,2,"Endometrial biopsy, Pelvic ultrasound",Gynecologist,,2024-01-19 08:35:00
+DX085,CASE042,Esophageal Cancer,C15.9,0.82,1,"Upper endoscopy, Biopsy, CT chest/abdomen","Oncologist, Gastroenterologist","Difficulty swallowing, Weight loss",2024-01-19 09:20:00
+DX086,CASE042,Achalasia,K22.0,0.74,2,"Esophageal manometry, Barium swallow",Gastroenterologist,,2024-01-19 09:20:00
+DX087,CASE043,Bipolar Disorder Type I,F31.9,0.83,1,"Clinical diagnosis, Rule out medical causes",Psychiatrist,,2024-01-19 10:05:00
+DX088,CASE043,Borderline Personality Disorder,F60.3,0.68,2,Clinical diagnosis,Psychiatrist,,2024-01-19 10:05:00
+DX089,CASE044,Plantar Fasciitis,M72.2,0.89,1,"Clinical diagnosis, Ultrasound foot","Podiatrist, Orthopedist",,2024-01-19 10:50:00
+DX090,CASE044,Heel Spur,M77.3,0.76,2,"X-ray foot, Clinical diagnosis",Podiatrist,,2024-01-19 10:50:00
+DX091,CASE045,Endometriosis,N80.9,0.87,1,"Laparoscopy, Pelvic ultrasound",Gynecologist,,2024-01-19 11:35:00
+DX092,CASE045,Pelvic Inflammatory Disease,N73.9,0.72,2,"Pelvic exam, Labs, Ultrasound",Gynecologist,,2024-01-19 11:35:00
+DX093,CASE046,Diabetic Retinopathy,E11.3,0.88,1,"Dilated eye exam, OCT, Fluorescein angiography",Ophthalmologist,,2024-01-19 12:20:00
+DX094,CASE046,Cataracts,H26.9,0.74,2,"Slit lamp exam, Visual acuity",Ophthalmologist,,2024-01-19 12:20:00
+DX095,CASE047,Lymphoma,C85.9,0.79,1,"Lymph node biopsy, CT chest/abdomen/pelvis, Blood work","Oncologist, Hematologist","Night sweats, Weight loss",2024-01-19 13:05:00
+DX096,CASE047,Infectious Mononucleosis,B27.9,0.73,2,"Monospot test, CBC",Infectious Disease,,2024-01-19 13:05:00
+DX097,CASE048,Colorectal Cancer,C18.9,0.81,1,"Colonoscopy, Biopsy, CEA level, CT abdomen","Oncologist, Gastroenterologist","Weight loss, Blood in stool",2024-01-19 13:50:00
+DX098,CASE048,Diverticulitis,K57.9,0.76,2,"CT abdomen, Colonoscopy after resolution",Gastroenterologist,,2024-01-19 13:50:00
+DX099,CASE049,Polycystic Ovary Syndrome,E28.2,0.90,1,"Pelvic ultrasound, Hormone panel, Glucose testing","Endocrinologist, Gynecologist",,2024-01-19 14:35:00
+DX100,CASE049,Congenital Adrenal Hyperplasia,E25.9,0.66,2,"17-hydroxyprogesterone, ACTH stimulation test",Endocrinologist,,2024-01-19 14:35:00
+DX101,CASE050,Laryngeal Cancer,C32.9,0.84,1,"Laryngoscopy, Biopsy, CT neck","Oncologist, Otolaryngologist","Persistent hoarseness, Weight loss",2024-01-19 15:20:00
+DX102,CASE050,Chronic Laryngitis,J37.0,0.71,2,"Laryngoscopy, Voice analysis",Otolaryngologist,,2024-01-19 15:20:00

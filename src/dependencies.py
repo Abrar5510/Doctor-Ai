@@ -65,15 +65,18 @@ class ServiceContainer:
         logger.info("Cleaning up services...")
 
         if cls._diagnostic_service:
-            # TODO: Add proper cleanup method to DiagnosticService
+            try:
+                cls._diagnostic_service.shutdown()
+            except Exception as e:
+                logger.error(f"Error shutting down DiagnosticService: {e}")
             cls._diagnostic_service = None
 
         if cls._ai_assistant:
-            # TODO: Add proper cleanup method to AIReasoningAssistant
+            # AIReasoningAssistant doesn't need explicit cleanup
             cls._ai_assistant = None
 
         if cls._audit_logger:
-            # TODO: Add proper cleanup method to AuditLogger
+            # AuditLogger doesn't need explicit cleanup
             cls._audit_logger = None
 
         logger.success("Service cleanup completed")
