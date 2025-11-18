@@ -196,11 +196,22 @@
   background: white;
   cursor: pointer;
   transition: border-color 0.2s;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  appearance: menulist;
+}
+
+.provider-select:hover {
+  border-color: var(--primary-color);
 }
 
 .provider-select:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .api-key-input {

@@ -75,6 +75,13 @@ function DiagnosisForm({ setResults, setLoading }) {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleProviderChange = (e) => {
+    const newProvider = e.target.value
+    setApiProvider(newProvider)
+    // Clear API key when switching providers to avoid confusion
+    setApiKey('')
+  }
+
   return (
     <div className="diagnosis-form-container">
       <h2>Enter Patient Information</h2>
@@ -168,9 +175,11 @@ function DiagnosisForm({ setResults, setLoading }) {
                 <label htmlFor="apiProvider">AI Provider</label>
                 <select
                   id="apiProvider"
+                  name="apiProvider"
                   value={apiProvider}
-                  onChange={(e) => setApiProvider(e.target.value)}
+                  onChange={handleProviderChange}
                   className="provider-select"
+                  aria-label="Select AI Provider"
                 >
                   <option value="openai">OpenAI (GPT-4)</option>
                   <option value="openrouter">OpenRouter (Multiple Models)</option>
