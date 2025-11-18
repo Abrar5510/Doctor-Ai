@@ -63,8 +63,53 @@ async def analyze_patient_case(
     try:
         logger.info(f"Received diagnostic request for case: {patient_case.case_id}")
 
+        # If API keys are provided, use AI to standardize symptoms first
+        standardization_result = None
+        if x_openai_key or x_openrouter_key:
+            try:
+                logger.info("API key provided, standardizing symptoms to medical terminology")
+
+                # Initialize AI assistant with user-provided key
+                if x_openrouter_key:
+                    from openai import AsyncOpenAI
+                    ai_for_standardization = AIReasoningAssistant(api_key=x_openrouter_key, use_local=False)
+                elif x_openai_key:
+                    ai_for_standardization = AIReasoningAssistant(api_key=x_openai_key, use_local=False)
+
+                # Prepare patient context for standardization
+                patient_context = {
+                    'age': patient_case.age,
+                    'sex': patient_case.sex,
+                    'medical_history': patient_case.medical_history or []
+                }
+
+                # Get symptoms description
+                symptoms_text = "\n".join([s.description for s in patient_case.symptoms])
+
+                # Standardize symptoms using AI
+                standardization_result = await ai_for_standardization.standardize_symptoms_to_medical_terms(
+                    symptoms_text,
+                    patient_context
+                )
+
+                # Update patient case with standardized terms
+                if standardization_result and 'chief_complaint_standardized' in standardization_result:
+                    patient_case.chief_complaint = standardization_result['chief_complaint_standardized']
+
+                logger.info(f"Symptoms standardized successfully: {len(standardization_result.get('search_terms', []))} search terms generated")
+
+            except Exception as std_error:
+                logger.warning(f"Symptom standardization failed, continuing with original input: {std_error}")
+                # Continue with original patient case if standardization fails
+
         # Perform diagnostic analysis
         result = service.analyze_patient_case(patient_case)
+
+        # Add standardization info to result if available
+        if standardization_result:
+            if not hasattr(result, 'ai_insights'):
+                result.ai_insights = {}
+            result.ai_insights['symptom_standardization'] = standardization_result
 
         # If API keys are provided, enhance with AI reasoning
         if (x_openai_key or x_openrouter_key) and result.differential_diagnoses:
