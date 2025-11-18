@@ -183,6 +183,92 @@ Format each question on a new line, numbered 1-{num_questions}."""
 
         return "Invalid report type"
 
+    async def standardize_symptoms_to_medical_terms(
+        self,
+        symptoms_description: str,
+        patient_context: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Standardize natural language symptoms into medical terminology
+
+        Args:
+            symptoms_description: Patient's description in their own words
+            patient_context: Optional context (age, sex, medical history)
+
+        Returns:
+            Dictionary with standardized terms and metadata
+        """
+        context_str = ""
+        if patient_context:
+            context_str = f"""
+Patient Context:
+- Age: {patient_context.get('age', 'unknown')}
+- Sex: {patient_context.get('sex', 'unknown')}
+- Medical History: {', '.join(patient_context.get('medical_history', [])) or 'None'}
+"""
+
+        prompt = f"""You are a medical terminology expert. Convert the following patient symptom description into standardized medical terminology using SNOMED CT, ICD-10, and HPO standards.
+
+Patient's Description:
+{symptoms_description}
+{context_str}
+
+Your task:
+1. Identify all symptoms mentioned in the description
+2. Convert each symptom to standardized medical terminology (SNOMED CT preferred)
+3. Provide both the common name and the medical term
+4. Extract key clinical features (severity, duration, location if mentioned)
+5. Identify any red flag symptoms
+
+Return ONLY a valid JSON object with this exact structure (no additional text):
+{{
+  "standardized_symptoms": [
+    {{
+      "original": "symptom as patient described",
+      "medical_term": "standardized medical term",
+      "snomed_ct": "SNOMED CT term if applicable",
+      "severity": "mild/moderate/severe if mentioned",
+      "duration": "duration if mentioned",
+      "location": "anatomical location if mentioned"
+    }}
+  ],
+  "chief_complaint_standardized": "main complaint in medical terms",
+  "red_flags": ["list of any red flag symptoms identified"],
+  "search_terms": ["optimized search terms for vector database"],
+  "clinical_summary": "brief clinical summary for database search"
+}}"""
+
+        response = await self._call_llm(prompt, temperature=0.3)
+
+        # Parse JSON response
+        try:
+            # Try to extract JSON from response
+            import re
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                result = json.loads(response)
+
+            return result
+        except json.JSONDecodeError as e:
+            logger.warning(f"Failed to parse standardization response as JSON: {e}")
+            # Fallback: return original with minimal structure
+            return {
+                "standardized_symptoms": [{
+                    "original": symptoms_description,
+                    "medical_term": symptoms_description,
+                    "snomed_ct": None,
+                    "severity": "unknown",
+                    "duration": None,
+                    "location": None
+                }],
+                "chief_complaint_standardized": symptoms_description,
+                "red_flags": [],
+                "search_terms": [symptoms_description],
+                "clinical_summary": symptoms_description
+            }
+
     async def explain_in_simple_terms(
         self,
         medical_condition: str,

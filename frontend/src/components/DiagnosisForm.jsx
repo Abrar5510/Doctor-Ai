@@ -85,6 +85,29 @@ function DiagnosisForm({ setResults, setLoading }) {
   return (
     <div className="diagnosis-form-container">
       <h2>Enter Patient Information</h2>
+
+      <div className="terminology-notice">
+        <div className="terminology-notice-header">
+          <svg className="terminology-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <h3>AI-Powered Terminology Standardization</h3>
+        </div>
+        <p className="terminology-description">
+          You can describe symptoms in your own words. Our AI will automatically standardize your input to match medical terminology standards used in our database:
+        </p>
+        <ul className="terminology-standards">
+          <li><strong>SNOMED CT</strong> - Systematized Nomenclature of Medicine Clinical Terms</li>
+          <li><strong>ICD-10</strong> - International Classification of Diseases</li>
+          <li><strong>HPO</strong> - Human Phenotype Ontology</li>
+        </ul>
+        <p className="terminology-benefit">
+          This ensures accurate diagnosis by matching your description with standardized medical conditions in our database.
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="diagnosis-form">
         <div className="form-group">
           <label htmlFor="symptoms">
