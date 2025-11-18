@@ -1,0 +1,78 @@
+# Python backend (not deployed to Vercel)
+src/
+tests/
+alembic/
+scripts/
+*.py
+requirements.txt
+runtime.txt
+alembic.ini
+pyproject.toml
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.github/
+
+# Documentation (not needed for deployment)
+*.md
+!frontend/README.md
+*.pptx
+
+# Datasets
+datasets/
+demo_data/
+
+# Render specific
+render.yaml

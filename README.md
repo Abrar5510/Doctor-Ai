@@ -188,16 +188,39 @@ ENABLE_RED_FLAG_ALERTS=True
 
 ## Deployment
 
+### Vercel (Frontend) + Backend Service (Recommended)
+
+Deploy the frontend to Vercel's global CDN and backend to any platform:
+
+```bash
+# Deploy frontend to Vercel
+vercel --prod
+
+# Backend can be deployed to:
+# - Render.com (see RENDER_DEPLOYMENT.md)
+# - Railway.app
+# - Fly.io
+# - Any platform supporting Python/FastAPI
+```
+
+**Complete guide**: See `VERCEL_DEPLOYMENT.md` for detailed instructions
+
+**Quick Deploy**:
+1. Push to GitHub
+2. Connect to Vercel dashboard
+3. Add `VITE_API_URL` environment variable
+4. Deploy!
+
+### Render.com (Full Stack)
+
+One-click deployment included - see `render.yaml` and `RENDER_DEPLOYMENT.md`
+
 ### Docker
 
 ```bash
 docker build -t doctor-ai:latest .
 docker compose up -d
 ```
-
-### Render.com (Cloud)
-
-One-click deployment included - see `render.yaml` and `RENDER_DEPLOYMENT.md`
 
 ## Architecture
 
@@ -231,9 +254,11 @@ All diagnostic suggestions require human review and clinical validation.
 
 ## Additional Documentation
 
+- **Vercel Deployment**: `VERCEL_DEPLOYMENT.md`
+- **Render Deployment**: `RENDER_DEPLOYMENT.md`
+- **Deployment Guide**: `DEPLOYMENT.md`
 - **Testing Guide**: `TESTING.md`
 - **Security Policy**: `SECURITY.md`
-- **Deployment Guide**: `DEPLOYMENT.md`
 - **Demo Guide**: `DEMO_GUIDE.md`
 - **Architecture Details**: `ARCHITECTURE.md`
 - **Contributing**: `CONTRIBUTING.md`
