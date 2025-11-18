@@ -1,133 +1,417 @@
+# ============================================================================
+# Doctor AI - Render Blueprint
+# ============================================================================
+# This blueprint deploys the complete Doctor AI Medical Symptom Mapper stack
+#
+# What gets deployed:
+# - Backend API (FastAPI + ML models)
+# - Frontend (React + Vite)
+# - PostgreSQL Database
+#
+# Additional services (require external setup or paid plans):
+# - Qdrant Vector DB: Use Qdrant Cloud (https://cloud.qdrant.io/)
+# - Redis Cache: Use Redis Cloud (https://redis.com/cloud/overview/)
+#
+# Deployment:
+# 1. Fork/push this repo to GitHub
+# 2. Go to https://render.com/dashboard
+# 3. Click "New" → "Blueprint"
+# 4. Connect your repository
+# 5. Add required secrets (OPENAI_API_KEY, etc.)
+# 6. Click "Apply"
+#
+# Documentation: See RENDER_DEPLOYMENT.md for detailed instructions
+# ============================================================================
+
 services:
+  # ==========================================================================
   # Backend API Service
+  # ==========================================================================
+  # FastAPI application with ML/NLP capabilities for medical diagnosis
+  # Includes BioBERT embeddings and symptom constellation mapping
+  # ==========================================================================
   - type: web
     name: doctor-ai-backend
-    env: python
+    runtime: python
     region: oregon
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    plan: starter  # Upgrade to 'standard' for production (2GB RAM recommended for ML models)
+    branch: main
+
+    # Build Configuration
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+
+    # Start Command
+    startCommand: |
+      alembic upgrade head
+      uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 1
+
+    # Health Check
+    healthCheckPath: /api/v1/monitoring/health
+
+    # Auto-deploy
+    autoDeploy: true
+
+    # Environment Variables
     envVars:
+      # ===== Application Configuration =====
       - key: APP_NAME
         value: Medical Symptom Constellation Mapper
+
       - key: APP_VERSION
         value: 0.2.0
+
       - key: DEBUG
         value: false
+
       - key: LOG_LEVEL
         value: INFO
+
+      # ===== API Configuration =====
       - key: API_HOST
         value: 0.0.0.0
+
       - key: API_PORT
         sync: false
         value: 10000
+
       - key: API_PREFIX
         value: /api/v1
+
+      # ===== Security Configuration =====
+      # Auto-generate a secure random secret key
       - key: SECRET_KEY
         generateValue: true
+
       - key: ALGORITHM
         value: HS256
+
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: 30
+
+      # ===== CORS Configuration =====
+      # IMPORTANT: Update this after deploying frontend to include your frontend URL
       - key: CORS_ORIGINS
         value: https://doctor-ai-frontend.onrender.com,http://localhost:3000
+
       - key: CORS_ALLOW_CREDENTIALS
         value: true
+
+      # ===== Rate Limiting =====
       - key: RATE_LIMIT_ENABLED
         value: true
+
       - key: RATE_LIMIT_REQUESTS
         value: 100
+
       - key: RATE_LIMIT_PERIOD
         value: 60
+
+      # ===== Database Configuration =====
+      # Automatically connects to the PostgreSQL database defined below
       - key: DATABASE_URL
         fromDatabase:
           name: doctor-ai-db
           property: connectionString
+
       - key: DATABASE_ECHO
         value: false
+
+      # ===== Qdrant Vector Database =====
+      # NOTE: Qdrant requires a private service or Qdrant Cloud
+      # For production: Sign up at https://cloud.qdrant.io/
+      # For demo: These settings will disable vector search features
       - key: QDRANT_HOST
-        fromService:
-          type: pserv
-          name: doctor-ai-qdrant
-          property: host
+        value: localhost
+
       - key: QDRANT_PORT
         value: 6333
+
+      - key: QDRANT_API_KEY
+        sync: false
+
       - key: QDRANT_COLLECTION_NAME
         value: medical_conditions
+
+      # ===== Redis Cache =====
+      # NOTE: Redis requires a private service or Redis Cloud
+      # For production: Sign up at https://redis.com/cloud/overview/
+      # For demo: These settings will disable caching
       - key: REDIS_HOST
-        fromService:
-          type: pserv
-          name: doctor-ai-redis
-          property: host
+        value: localhost
+
       - key: REDIS_PORT
         value: 6379
+
       - key: REDIS_DB
         value: 0
+
+      - key: REDIS_PASSWORD
+        sync: false
+
+      # ===== ML/NLP Models =====
+      # BioBERT model for medical text embeddings (~420MB download)
       - key: EMBEDDING_MODEL
         value: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+
       - key: EMBEDDING_DIMENSION
         value: 768
+
       - key: MAX_SEQUENCE_LENGTH
         value: 512
+
+      # ===== AI Assistant Configuration =====
+      # REQUIRED: Add your OpenAI API key for AI assistant features
+      # Get your key at: https://platform.openai.com/api-keys
       - key: OPENAI_API_KEY
-        sync: false
+        sync: false  # Must be added manually in Render dashboard
+
       - key: USE_LOCAL_LLM
         value: false
+
+      - key: LOCAL_LLM_MODEL
+        value: llama2
+
+      # ===== Medical Ontology Configuration =====
       - key: USE_SNOMED_CT
         value: true
+
       - key: USE_ICD10
         value: true
+
       - key: USE_HPO
         value: true
+
+      # ===== Confidence Thresholds =====
+      # Adjust these based on your accuracy requirements
       - key: TIER1_CONFIDENCE_THRESHOLD
         value: 0.85
+
       - key: TIER2_CONFIDENCE_THRESHOLD
         value: 0.60
+
       - key: TIER3_CONFIDENCE_THRESHOLD
         value: 0.40
+
+      # ===== Search Parameters =====
       - key: TOP_K_CANDIDATES
         value: 50
+
       - key: FINAL_RESULTS_LIMIT
         value: 10
+
+      # ===== HIPAA Compliance =====
       - key: ENABLE_AUDIT_LOGGING
         value: true
+
       - key: ENABLE_DATA_ANONYMIZATION
         value: true
+
       - key: AUDIT_LOG_PATH
-        value: ./logs/audit/
+        value: /var/data/logs/audit/
+
+      # ===== Feature Flags =====
       - key: ENABLE_RARE_DISEASE_DETECTION
         value: true
+
       - key: ENABLE_RED_FLAG_ALERTS
         value: true
+
       - key: ENABLE_TEMPORAL_ANALYSIS
         value: true
+
       - key: ENABLE_AI_ASSISTANT
         value: true
-    healthCheckPath: /api/v1/monitoring/health
 
+  # ==========================================================================
   # Frontend Service
+  # ==========================================================================
+  # React + Vite static site with responsive UI
+  # Serves the web interface for symptom analysis and diagnosis
+  # ==========================================================================
   - type: web
     name: doctor-ai-frontend
-    env: static
+    runtime: static
     region: oregon
-    plan: starter
-    buildCommand: cd frontend && npm install && npm run build
+    plan: starter  # Static sites are FREE on Render
+    branch: main
+
+    # Build Configuration
+    buildCommand: |
+      cd frontend
+      npm ci
+      npm run build
+
+    # Static site configuration
     staticPublishPath: frontend/dist
+
+    # Auto-deploy
+    autoDeploy: true
+
+    # Route Configuration
+    # Handle React Router by rewriting all routes to index.html
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
+    # Pull request previews
+    pullRequestPreviewsEnabled: true
+
+    # Environment Variables
     envVars:
+      # API URL - automatically set to the backend service URL
       - key: VITE_API_URL
         fromService:
           type: web
           name: doctor-ai-backend
           envVarKey: RENDER_EXTERNAL_URL
 
+# ============================================================================
+# Databases
+# ============================================================================
+
 databases:
+  # ==========================================================================
   # PostgreSQL Database
+  # ==========================================================================
+  # Primary database for application data, user accounts, and medical records
+  # ==========================================================================
   - name: doctor-ai-db
     databaseName: doctor_ai
     user: doctor_ai_user
     region: oregon
-    plan: starter
+    plan: starter  # $7/month - includes 1GB storage, automatic backups
+    # Upgrade to 'standard' ($20/month) for production with more storage
+
+    # Database version
+    ipAllowList: []  # Empty = allow connections from all Render services
+
+    # Automatic daily backups (retention based on plan)
+    # Starter: 7 days
+    # Standard: 30 days
+
+# ============================================================================
+# Additional Services (External)
+# ============================================================================
+# The following services are not included in this blueprint and require
+# external setup:
+#
+# 1. Qdrant Vector Database (for semantic search)
+#    - Option A: Qdrant Cloud - https://cloud.qdrant.io/
+#      * Free tier: 1GB storage, 100K vectors
+#      * Starter: $25/month
+#    - Option B: Self-hosted on Render (requires Private Service)
+#      * Add QDRANT_HOST and QDRANT_API_KEY to backend env vars
+#
+# 2. Redis Cache (for performance)
+#    - Option A: Redis Cloud - https://redis.com/cloud/overview/
+#      * Free tier: 30MB
+#      * Starter: $5/month for 250MB
+#    - Option B: Upstash Redis - https://upstash.com/
+#      * Free tier: 10K requests/day
+#    - Add REDIS_HOST, REDIS_PORT, REDIS_PASSWORD to backend env vars
+#
+# 3. OpenAI API (for AI assistant)
+#    - Sign up: https://platform.openai.com/
+#    - Add OPENAI_API_KEY to backend env vars
+#
+# ============================================================================
+
+# ============================================================================
+# Post-Deployment Steps
+# ============================================================================
+# After deploying this blueprint:
+#
+# 1. ✅ Add OPENAI_API_KEY to backend environment variables
+#    - Go to doctor-ai-backend → Environment
+#    - Add: OPENAI_API_KEY = your-key-here
+#
+# 2. ✅ Update CORS_ORIGINS with your frontend URL
+#    - Wait for frontend to deploy
+#    - Copy the frontend URL
+#    - Update backend CORS_ORIGINS to include it
+#
+# 3. ✅ (Optional) Set up Qdrant Cloud for vector search
+#    - Sign up at https://cloud.qdrant.io/
+#    - Create a cluster
+#    - Add QDRANT_HOST and QDRANT_API_KEY to backend
+#
+# 4. ✅ (Optional) Set up Redis for caching
+#    - Sign up at https://redis.com/cloud/overview/
+#    - Create a database
+#    - Add REDIS_HOST, REDIS_PORT, REDIS_PASSWORD to backend
+#
+# 5. ✅ Test your deployment
+#    - Backend health: https://your-backend.onrender.com/api/v1/monitoring/health
+#    - API docs: https://your-backend.onrender.com/docs
+#    - Frontend: https://your-frontend.onrender.com
+#    - Dashboard: https://your-frontend.onrender.com/dashboard
+#
+# 6. ✅ Monitor your application
+#    - Check logs in Render dashboard
+#    - Monitor metrics at /api/v1/monitoring/metrics
+#    - Review dashboard analytics
+#
+# ============================================================================
+
+# ============================================================================
+# Cost Estimate
+# ============================================================================
+#
+# Minimal Setup (Demo/Testing):
+# - PostgreSQL Starter:        $7/month
+# - Backend Starter (512MB):   $7/month
+# - Frontend Static:           FREE
+# - Total:                     ~$14/month
+#
+# Recommended Setup (Production):
+# - PostgreSQL Standard:       $20/month
+# - Backend Standard (2GB):    $25/month
+# - Frontend Pro:              $3/month
+# - Qdrant Cloud Starter:      $25/month
+# - Redis Cloud Starter:       $5/month
+# - Total:                     ~$78/month
+#
+# Enterprise Setup:
+# - PostgreSQL Pro:            $90/month
+# - Backend Pro (4GB+):        $85/month
+# - Frontend Pro:              $3/month
+# - Qdrant Cloud Growth:       $95/month
+# - Redis Cloud Pro:           $15/month
+# - Total:                     ~$288/month
+#
+# ============================================================================
+
+# ============================================================================
+# Troubleshooting
+# ============================================================================
+#
+# Service won't start:
+# - Check environment variables are set correctly
+# - Review logs in Render dashboard
+# - Verify DATABASE_URL is connecting
+# - Ensure sufficient memory (upgrade plan if needed)
+#
+# Frontend can't connect to backend:
+# - Verify VITE_API_URL is set correctly
+# - Check CORS_ORIGINS includes frontend URL
+# - Test backend health endpoint directly
+#
+# ML model errors:
+# - Upgrade to Standard plan (2GB RAM minimum)
+# - Check internet connectivity for model downloads
+# - Review transformers library installation
+#
+# Database connection issues:
+# - Verify using internal database URL
+# - Check database service is running
+# - Review database credentials
+#
+# For more help:
+# - Documentation: See RENDER_DEPLOYMENT.md
+# - Render Docs: https://render.com/docs
+# - Community: https://community.render.com
+#
+# ============================================================================
