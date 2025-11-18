@@ -7,22 +7,24 @@ This guide explains how to deploy the Doctor AI application using Vercel for the
 **Important**: Vercel is designed for frontend applications and serverless functions. Due to the nature of this application (large ML models, FastAPI backend, stateful services), we use a **hybrid deployment approach**:
 
 - **Frontend**: Deployed on Vercel (React + Vite)
-- **Backend**: Deployed on Render, Railway, Fly.io, or similar platform (FastAPI + ML models)
+- **Backend**: Self-hosted or deployed to container platform (FastAPI + ML models)
 
 This approach provides:
 - ✅ Fast, global CDN for frontend (Vercel)
 - ✅ Optimal performance for ML models (dedicated backend service)
 - ✅ No cold start issues
 - ✅ Cost-effective deployment
+- ✅ Full control over infrastructure
 
 ## Prerequisites
 
 1. **Vercel Account**: Sign up at https://vercel.com
 2. **Backend Deployment**: Your backend should be deployed and accessible via URL
-   - Render (recommended - see `RENDER_DEPLOYMENT.md`)
+   - Docker/Docker Compose (local or cloud)
    - Railway: https://railway.app
    - Fly.io: https://fly.io
-   - Any other platform supporting Python/FastAPI
+   - AWS/GCP/Azure container services
+   - Any platform supporting Docker containers
 3. **Git Repository**: Code pushed to GitHub, GitLab, or Bitbucket
 
 ## Deployment Options
@@ -31,8 +33,18 @@ This approach provides:
 
 #### Step 1: Prepare Backend
 
-1. **Deploy your backend** to Render, Railway, or similar platform (see `RENDER_DEPLOYMENT.md`)
-2. **Note your backend URL**, e.g., `https://doctor-ai-backend.onrender.com`
+1. **Deploy your backend** using Docker or container platform:
+   ```bash
+   # Local/Docker option
+   docker compose up -d
+
+   # Or deploy to cloud platform
+   # - Railway.app
+   # - Fly.io
+   # - AWS ECS/Fargate
+   # - Google Cloud Run
+   ```
+2. **Note your backend URL**, e.g., `https://your-backend-domain.com` or `http://your-ip:8000`
 3. **Ensure CORS is configured** on the backend to allow your Vercel domain
 
 #### Step 2: Deploy Frontend to Vercel
@@ -55,9 +67,13 @@ This approach provides:
 
 5. **Add Environment Variables**:
    ```
-   VITE_API_URL = https://your-backend-url.onrender.com
+   VITE_API_URL = https://your-backend-url.com
    ```
    Replace with your actual backend URL (without trailing slash)
+   Examples:
+   - `https://api.yourdomain.com`
+   - `https://your-server-ip:8000`
+   - `https://doctor-ai-backend.railway.app`
 
 6. **Deploy**:
    - Click "Deploy"
@@ -66,15 +82,24 @@ This approach provides:
 
 #### Step 3: Update Backend CORS
 
-1. **Go to your backend service** (e.g., Render dashboard)
+1. **Update your backend configuration**
+   - If using Docker: Update `.env` file
+   - If using cloud platform: Update environment variables in dashboard
 
-2. **Update CORS_ORIGINS environment variable**:
-   ```
+2. **Set CORS_ORIGINS environment variable**:
+   ```bash
    CORS_ORIGINS=https://doctor-ai-xyz.vercel.app,http://localhost:3000
    ```
    Include your Vercel URL (the one provided after deployment)
 
-3. **Redeploy backend** service to apply changes
+3. **Restart backend** service to apply changes:
+   ```bash
+   # If using Docker
+   docker compose restart api
+
+   # If using cloud platform
+   # Restart via platform dashboard
+   ```
 
 4. **Test the connection**:
    - Visit your Vercel URL
@@ -101,7 +126,7 @@ vercel login
    ```bash
    vercel env add VITE_API_URL
    ```
-   Enter your backend URL when prompted: `https://your-backend-url.onrender.com`
+   Enter your backend URL when prompted: `https://your-backend-url.com`
 
 2. **Deploy**:
    ```bash
@@ -149,16 +174,16 @@ Same as Option 1, Step 3.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `VITE_API_URL` | Backend API base URL | `https://doctor-ai-backend.onrender.com` |
+| `VITE_API_URL` | Backend API base URL | `https://your-backend.com` or `http://your-ip:8000` |
 
 **Important**:
 - No trailing slash in `VITE_API_URL`
 - Must be accessible from browser (public URL)
 - Must have CORS configured
 
-### Backend (Render/Railway/Fly.io)
+### Backend (Docker/Cloud Platform)
 
-Add your Vercel domain(s) to `CORS_ORIGINS`:
+Add your Vercel domain(s) to `CORS_ORIGINS` in your `.env` file or platform settings:
 ```
 CORS_ORIGINS=https://your-app.vercel.app,https://your-custom-domain.com,http://localhost:3000
 ```
@@ -303,11 +328,11 @@ Perfect for:
 - **Team Features**: Included
 - **Total**: **$20/month**
 
-### With Backend (Render)
+### With Self-Hosted Backend
 - **Vercel Frontend**: $0/month (free tier)
-- **Render Backend**: $0-25/month (free or starter plan)
-- **Render Database**: $0-7/month (external free DB or paid)
-- **Total**: **$0-52/month**
+- **Self-Hosted Backend**: Variable cost (VPS, cloud, or free local)
+- **Database**: Included in Docker Compose or cloud service
+- **Total**: **$0+ /month** (depending on hosting choice)
 
 ## Troubleshooting
 
@@ -454,7 +479,9 @@ Configure preview branch deployments:
 ### 1. Backend Health Check
 
 ```bash
-curl https://your-backend.onrender.com/api/v1/monitoring/health
+curl https://your-backend.com/api/v1/monitoring/health
+# Or if using local/IP
+curl http://your-server-ip:8000/api/v1/monitoring/health
 ```
 
 Expected response:
@@ -490,19 +517,15 @@ Check:
 4. **Submit Test**: Enter symptoms and submit
 5. **View Results**: Check diagnosis results display
 
-## Comparison: Vercel vs Render
+## Deployment Architecture
 
-| Feature | Vercel (Frontend) | Render (Backend) |
-|---------|-------------------|------------------|
-| **Best For** | React, Vue, Next.js | Python, Node, Go APIs |
-| **Free Tier** | 100GB bandwidth | 750 hours/month |
-| **Build Time** | Fast (2-5 min) | Moderate (3-10 min) |
-| **Cold Starts** | None (CDN) | Yes on free tier |
-| **Custom Domains** | Free | Free |
-| **SSL** | Automatic | Automatic |
-| **Global CDN** | Yes | No (single region) |
-| **ML Models** | Not suitable | ✅ Suitable |
-| **Databases** | Not included | PostgreSQL available |
+| Component | Hosting Option | Notes |
+|-----------|----------------|-------|
+| **Frontend** | Vercel | Global CDN, automatic SSL, free tier |
+| **Backend** | Docker/Self-hosted | Full control, ML model support |
+| **Database** | Docker Compose | PostgreSQL included |
+| **Vector DB** | Docker Compose | Qdrant included |
+| **Cache** | Docker Compose | Redis included |
 
 ## Alternative Backend Options
 
@@ -526,16 +549,16 @@ Check:
 - **Cons**: More expensive
 - **Setup**: Container or source code
 
-## Migration from Render to Vercel (Frontend Only)
+## Deployment Strategy
 
-If you're currently using Render for everything:
+Recommended approach:
 
-1. **Keep Backend on Render**: Don't change anything
+1. **Deploy Backend**: Use Docker Compose locally or on a cloud VPS
 2. **Deploy Frontend to Vercel**: Follow this guide
-3. **Update CORS**: Add Vercel domain to backend
+3. **Update CORS**: Add Vercel domain to backend `.env`
 4. **Test**: Ensure everything works
 5. **Update DNS** (if using custom domain): Point to Vercel
-6. **Remove Frontend from Render**: Optional, can keep as backup
+6. **Monitor**: Set up logging and monitoring for both services
 
 ## Support and Resources
 
@@ -546,15 +569,15 @@ If you're currently using Render for everything:
 
 ### Doctor AI Resources
 - **Main README**: See `README.md`
-- **Render Deployment**: See `RENDER_DEPLOYMENT.md`
+- **Docker Setup**: See `docker-compose.yml`
 - **API Documentation**: https://your-backend.com/docs
 
 ### Getting Help
 
 1. **Build Issues**: Check Vercel deployment logs
 2. **Runtime Issues**: Check browser console
-3. **API Issues**: Check backend logs on Render
-4. **CORS Issues**: Verify CORS_ORIGINS includes your domain
+3. **API Issues**: Check backend Docker logs with `docker compose logs api`
+4. **CORS Issues**: Verify CORS_ORIGINS in `.env` includes your domain
 
 ## Next Steps
 
@@ -573,9 +596,10 @@ After successful deployment:
 
 This hybrid deployment approach gives you:
 - ⚡ Lightning-fast frontend (Vercel CDN)
-- 🧠 Powerful backend (Render/Railway/etc.)
-- 💰 Cost-effective ($0-52/month)
-- 🌍 Global performance
+- 🧠 Powerful backend (Docker/Self-hosted)
+- 💰 Cost-effective (Free Vercel tier + your hosting)
+- 🌍 Global frontend performance
 - 🔒 Secure and scalable
+- 🎯 Full control over infrastructure
 
 Your Doctor AI application is now deployed and ready to help diagnose symptoms worldwide! 🏥✨
