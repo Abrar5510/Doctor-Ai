@@ -73,7 +73,6 @@ services:
         value: 0.0.0.0
 
       - key: API_PORT
-        sync: false
         value: 10000
 
       - key: API_PREFIX
@@ -233,8 +232,6 @@ services:
   - type: web
     name: doctor-ai-frontend
     runtime: static
-    region: oregon
-    plan: starter  # Static sites are FREE on Render
     branch: main
 
     # Build Configuration
@@ -369,18 +366,18 @@ databases:
 # Recommended Setup (Production):
 # - PostgreSQL Standard:       $20/month
 # - Backend Standard (2GB):    $25/month
-# - Frontend Pro:              $3/month
+# - Frontend Static:           FREE
 # - Qdrant Cloud Starter:      $25/month
 # - Redis Cloud Starter:       $5/month
-# - Total:                     ~$78/month
+# - Total:                     ~$75/month
 #
 # Enterprise Setup:
 # - PostgreSQL Pro:            $90/month
 # - Backend Pro (4GB+):        $85/month
-# - Frontend Pro:              $3/month
+# - Frontend Static:           FREE
 # - Qdrant Cloud Growth:       $95/month
 # - Redis Cloud Pro:           $15/month
-# - Total:                     ~$288/month
+# - Total:                     ~$285/month
 #
 # ============================================================================
 
