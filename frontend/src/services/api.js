@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+// For Vercel deployment, use same-domain API (empty baseURL means relative to current domain)
+// For local development, use localhost backend
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000' : ''),
   headers: {
     'Content-Type': 'application/json',
   },

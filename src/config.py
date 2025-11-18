@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     qdrant_collection_name: str = "medical_conditions"
 
     # Redis Cache
+    redis_enabled: bool = False  # Disabled by default, enable in production if Redis is available
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_db: int = 0
