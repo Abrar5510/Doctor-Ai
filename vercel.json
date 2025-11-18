@@ -47,18 +47,5 @@
   "framework": "vite",
   "installCommand": "cd frontend && npm install",
   "devCommand": "cd frontend && npm run dev",
-  "regions": ["iad1"],
-  "env": {
-    "ENVIRONMENT": "production",
-    "SECRET_KEY": "@secret_key",
-    "OPENAI_API_KEY": "@openai_api_key",
-    "QDRANT_HOST": "@qdrant_host",
-    "QDRANT_PORT": "@qdrant_port",
-    "QDRANT_API_KEY": "@qdrant_api_key",
-    "REDIS_ENABLED": "@redis_enabled",
-    "REDIS_HOST": "@redis_host",
-    "REDIS_PORT": "@redis_port",
-    "REDIS_PASSWORD": "@redis_password",
-    "VITE_API_URL": ""
-  }
+  "regions": ["iad1"]
 }

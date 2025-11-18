@@ -2,14 +2,44 @@
 Configuration management for the Medical Symptom Constellation Mapper
 """
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator, model_validator
 from functools import lru_cache
 from typing import Optional
 import os
 
 
+def get_database_url() -> str:
+    """
+    Get database URL with Vercel Postgres fallback.
+
+    Priority:
+    1. DATABASE_URL environment variable
+    2. POSTGRES_URL_NON_POOLING (Vercel Postgres automatic variable)
+    3. POSTGRES_URL (Vercel Postgres pooled connection)
+    """
+    db_url = os.getenv('DATABASE_URL')
+    if db_url:
+        return db_url
+
+    # Fallback to Vercel Postgres environment variables
+    db_url = os.getenv('POSTGRES_URL_NON_POOLING') or os.getenv('POSTGRES_URL')
+    if db_url:
+        return db_url
+
+    # If no database URL is found, return empty string
+    # The validation will catch this and provide a helpful error
+    return ""
+
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore"
+    )
 
     # Application Settings
     app_name: str = "Medical Symptom Constellation Mapper"
@@ -37,18 +67,21 @@ class Settings(BaseSettings):
     rate_limit_period: int = 60  # seconds
 
     # Database
-    # REQUIRED: Must be set via DATABASE_URL environment variable
-    # For Vercel Postgres, automatically falls back to POSTGRES_URL_NON_POOLING
-    database_url: str = None
+    # Automatically uses POSTGRES_URL_NON_POOLING or POSTGRES_URL if DATABASE_URL not set
+    database_url: str = Field(default_factory=get_database_url)
     database_echo: bool = False
 
-    def __init__(self, **kwargs):
-        # Check for Vercel Postgres environment variable if DATABASE_URL not set
-        if 'database_url' not in kwargs and not os.getenv('DATABASE_URL'):
-            vercel_db_url = os.getenv('POSTGRES_URL_NON_POOLING')
-            if vercel_db_url:
-                kwargs['database_url'] = vercel_db_url
-        super().__init__(**kwargs)
+    @field_validator('database_url')
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        """Validate that database URL is set"""
+        if not v:
+            raise ValueError(
+                "Database URL not configured. Please set one of:\n"
+                "  - DATABASE_URL environment variable\n"
+                "  - Connect Vercel Postgres to your project (provides POSTGRES_URL automatically)"
+            )
+        return v
 
     # Qdrant Vector Database
     qdrant_host: str = "localhost"
@@ -100,10 +133,6 @@ class Settings(BaseSettings):
     enable_red_flag_alerts: bool = True
     enable_temporal_analysis: bool = True
     enable_ai_assistant: bool = True
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
 
     def get_cors_origins(self) -> list:
         """Get CORS origins as a list. Never allows wildcard for security."""
