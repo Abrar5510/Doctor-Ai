@@ -1,11 +1,11 @@
 # Frontend Deployment - Ignore backend files
 
 # Python backend
-src/
-api/
-tests/
-alembic/
-scripts/
+/src/
+/api/
+/tests/
+/alembic/
+/scripts/
 *.py
 requirements.txt
 runtime.txt
