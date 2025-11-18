@@ -238,6 +238,25 @@ All diagnostic suggestions require human review and clinical validation.
 - **Architecture Details**: `ARCHITECTURE.md`
 - **Contributing**: `CONTRIBUTING.md`
 
+## Additional Information
+
+### Important Considerations
+
+- **Clinical Use**: This is a decision support tool for healthcare professionals, not a standalone diagnostic system
+- **Data Requirements**: Requires 8GB+ RAM and proper medical datasets (HPO, ICD-10) for optimal performance
+- **Deployment**: Docker-based deployment recommended for consistent environment across development and production
+- **Model Loading**: Initial startup may take 2-3 minutes while loading BioBERT/PubMedBERT models
+- **Privacy**: All patient data processing follows HIPAA compliance guidelines with encryption and audit logging
+- **Limitations**: Performance depends on quality and completeness of symptom descriptions provided
+- **Support**: For troubleshooting, see `SETUP.md` for common issues and solutions
+
+### Quick Tips
+
+- Use demo data for testing before processing real patient cases
+- Monitor system metrics via dashboard at `/dashboard` for performance insights
+- Enable rare disease detection for comprehensive diagnostic coverage
+- Review confidence thresholds in `.env` to adjust triage sensitivity
+
 ## License
 
 MIT License - see `LICENSE` file
