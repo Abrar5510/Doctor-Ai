@@ -43,26 +43,42 @@ class AIReasoningAssistant:
         Initialize the AI reasoning assistant
 
         Args:
-            api_key: OpenAI API key (if using GPT-4)
-            use_local: Use local LLM (Ollama) instead of OpenAI
+            api_key: OpenAI or OpenRouter API key (if using cloud LLM)
+            use_local: Use local LLM (Ollama) instead of cloud API
         """
         self.settings = get_settings()
         self.use_local = use_local
 
-        if not use_local and OPENAI_AVAILABLE and api_key:
-            self.client = AsyncOpenAI(api_key=api_key)
-            self.model = "gpt-4-turbo-preview"
-            logger.info("AI Assistant initialized with GPT-4")
+        if not use_local and OPENAI_AVAILABLE:
+            # Check if using OpenRouter
+            if self.settings.use_openrouter and self.settings.openrouter_api_key:
+                self.client = AsyncOpenAI(
+                    api_key=self.settings.openrouter_api_key,
+                    base_url="https://openrouter.ai/api/v1"
+                )
+                self.model = self.settings.openrouter_model
+                logger.info(f"AI Assistant initialized with OpenRouter using model: {self.model}")
+            elif api_key:
+                # Use direct OpenAI API
+                self.client = AsyncOpenAI(api_key=api_key)
+                self.model = "gpt-4-turbo-preview"
+                logger.info("AI Assistant initialized with OpenAI GPT-4")
+            else:
+                self.client = None
+                logger.error("AI Assistant not initialized: No API key provided")
+                raise ValueError(
+                    "AI Assistant requires an API key. "
+                    "Set OPENAI_API_KEY or configure OpenRouter with USE_OPENROUTER=True and OPENROUTER_API_KEY."
+                )
         elif use_local:
             # For local LLM using Ollama
             self.model = "llama2"
             logger.info("AI Assistant initialized with local Llama2")
         else:
             self.client = None
-            logger.error("AI Assistant not initialized: No API key provided and local mode not enabled")
+            logger.error("AI Assistant not initialized: OpenAI library not available")
             raise ValueError(
-                "AI Assistant requires either an OpenAI API key or local LLM mode to be enabled. "
-                "Set OPENAI_API_KEY environment variable or enable USE_LOCAL_LLM."
+                "AI Assistant requires the OpenAI library. Install with: pip install openai"
             )
 
     async def generate_detailed_explanation(

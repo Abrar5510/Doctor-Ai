@@ -56,8 +56,11 @@ class Settings(BaseSettings):
     embedding_dimension: int = 768
     max_sequence_length: int = 512
 
-    # AI Assistant (OpenAI)
+    # AI Assistant (OpenAI / OpenRouter)
     openai_api_key: Optional[str] = None
+    use_openrouter: bool = False
+    openrouter_api_key: Optional[str] = None
+    openrouter_model: str = "openai/gpt-4-turbo-preview"
     use_local_llm: bool = False
     local_llm_model: str = "llama2"
 
