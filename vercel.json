@@ -10,6 +10,13 @@
       }
     },
     {
+      "src": "api/init_database.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    },
+    {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -18,6 +25,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/init_database",
+      "dest": "/api/init_database.py"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.py"
