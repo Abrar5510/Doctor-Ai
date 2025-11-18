@@ -1,0 +1,133 @@
+services:
+  # Backend API Service
+  - type: web
+    name: doctor-ai-backend
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_NAME
+        value: Medical Symptom Constellation Mapper
+      - key: APP_VERSION
+        value: 0.2.0
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        sync: false
+        value: 10000
+      - key: API_PREFIX
+        value: /api/v1
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: CORS_ORIGINS
+        value: https://doctor-ai-frontend.onrender.com,http://localhost:3000
+      - key: CORS_ALLOW_CREDENTIALS
+        value: true
+      - key: RATE_LIMIT_ENABLED
+        value: true
+      - key: RATE_LIMIT_REQUESTS
+        value: 100
+      - key: RATE_LIMIT_PERIOD
+        value: 60
+      - key: DATABASE_URL
+        fromDatabase:
+          name: doctor-ai-db
+          property: connectionString
+      - key: DATABASE_ECHO
+        value: false
+      - key: QDRANT_HOST
+        fromService:
+          type: pserv
+          name: doctor-ai-qdrant
+          property: host
+      - key: QDRANT_PORT
+        value: 6333
+      - key: QDRANT_COLLECTION_NAME
+        value: medical_conditions
+      - key: REDIS_HOST
+        fromService:
+          type: pserv
+          name: doctor-ai-redis
+          property: host
+      - key: REDIS_PORT
+        value: 6379
+      - key: REDIS_DB
+        value: 0
+      - key: EMBEDDING_MODEL
+        value: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+      - key: EMBEDDING_DIMENSION
+        value: 768
+      - key: MAX_SEQUENCE_LENGTH
+        value: 512
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: USE_LOCAL_LLM
+        value: false
+      - key: USE_SNOMED_CT
+        value: true
+      - key: USE_ICD10
+        value: true
+      - key: USE_HPO
+        value: true
+      - key: TIER1_CONFIDENCE_THRESHOLD
+        value: 0.85
+      - key: TIER2_CONFIDENCE_THRESHOLD
+        value: 0.60
+      - key: TIER3_CONFIDENCE_THRESHOLD
+        value: 0.40
+      - key: TOP_K_CANDIDATES
+        value: 50
+      - key: FINAL_RESULTS_LIMIT
+        value: 10
+      - key: ENABLE_AUDIT_LOGGING
+        value: true
+      - key: ENABLE_DATA_ANONYMIZATION
+        value: true
+      - key: AUDIT_LOG_PATH
+        value: ./logs/audit/
+      - key: ENABLE_RARE_DISEASE_DETECTION
+        value: true
+      - key: ENABLE_RED_FLAG_ALERTS
+        value: true
+      - key: ENABLE_TEMPORAL_ANALYSIS
+        value: true
+      - key: ENABLE_AI_ASSISTANT
+        value: true
+    healthCheckPath: /api/v1/monitoring/health
+
+  # Frontend Service
+  - type: web
+    name: doctor-ai-frontend
+    env: static
+    region: oregon
+    plan: starter
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: doctor-ai-backend
+          envVarKey: RENDER_EXTERNAL_URL
+
+databases:
+  # PostgreSQL Database
+  - name: doctor-ai-db
+    databaseName: doctor_ai
+    user: doctor_ai_user
+    region: oregon
+    plan: starter

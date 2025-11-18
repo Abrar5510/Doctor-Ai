@@ -1,0 +1,31 @@
+case_id,patient_age,patient_sex,chief_complaint,symptoms,medical_history,created_at,status,review_tier
+CASE001,45,M,Severe chest pain,"chest pain radiating to left arm, shortness of breath, sweating, nausea",hypertension; high cholesterol,2024-01-15 09:30:00,completed,1
+CASE002,28,F,Persistent headache,"severe headache, sensitivity to light, nausea, visual aura",migraine history,2024-01-15 10:15:00,completed,1
+CASE003,62,M,Chronic cough,"persistent dry cough, weight loss, night sweats, fatigue",smoking history 30 years,2024-01-15 11:00:00,completed,2
+CASE004,35,F,Joint pain and fatigue,"joint pain in hands and knees, morning stiffness, fatigue, low-grade fever",family history autoimmune disease,2024-01-15 11:45:00,completed,2
+CASE005,8,M,High fever and rash,"high fever, red rash spreading from face, cough, runny nose",no vaccinations,2024-01-15 12:30:00,completed,1
+CASE006,55,F,Unexplained weight loss,"weight loss 20 pounds, fatigue, increased thirst, frequent urination",family history diabetes,2024-01-15 13:15:00,completed,1
+CASE007,42,M,Abdominal pain,"severe right lower abdominal pain, nausea, vomiting, fever, loss of appetite",none,2024-01-15 14:00:00,completed,1
+CASE008,70,F,Memory problems,"progressive memory loss, confusion, difficulty with daily tasks, mood changes",hypertension,2024-01-15 14:45:00,completed,3
+CASE009,19,F,Shortness of breath,"shortness of breath, wheezing, chest tightness, triggered by exercise",childhood asthma,2024-01-15 15:30:00,completed,1
+CASE010,58,M,Leg swelling,"swelling in both legs, shortness of breath, fatigue, rapid weight gain",history of heart disease,2024-01-15 16:15:00,completed,2
+CASE011,33,F,Severe fatigue,"extreme fatigue, weight gain, cold intolerance, dry skin, hair loss",none,2024-01-16 08:00:00,completed,2
+CASE012,50,M,Blood in urine,"blood in urine, flank pain, frequent urination, burning sensation",kidney stones 5 years ago,2024-01-16 08:45:00,completed,2
+CASE013,25,F,Sudden vision loss,"sudden vision loss in right eye, eye pain, headache",none,2024-01-16 09:30:00,completed,1
+CASE014,65,M,Dizziness and confusion,"dizziness, confusion, slurred speech, weakness on left side",atrial fibrillation,2024-01-16 10:15:00,completed,1
+CASE015,40,F,Severe anxiety,"severe anxiety, rapid heartbeat, trembling, sweating, chest pain",depression history,2024-01-16 11:00:00,completed,2
+CASE016,12,M,Severe sore throat,"severe sore throat, difficulty swallowing, drooling, high fever, muffled voice",none,2024-01-16 11:45:00,completed,1
+CASE017,48,F,Skin changes,"dark velvety patches on neck and armpits, weight gain, fatigue",obesity; family history diabetes,2024-01-16 12:30:00,completed,2
+CASE018,72,M,Difficulty urinating,"difficulty starting urination, weak stream, frequent nighttime urination",none,2024-01-16 13:15:00,completed,2
+CASE019,30,F,Pregnancy concerns,"missed period, nausea, breast tenderness, fatigue",previous miscarriage,2024-01-16 14:00:00,completed,1
+CASE020,56,M,Tremor and stiffness,"tremor in right hand at rest, muscle stiffness, slow movement, balance problems",none,2024-01-16 14:45:00,completed,3
+CASE021,38,F,Pelvic pain,"chronic pelvic pain, heavy menstrual bleeding, pain during intercourse",endometriosis suspected,2024-01-17 08:30:00,completed,2
+CASE022,15,M,Growing pains,"pain in legs at night, fatigue, pale skin, easy bruising",recent viral infection,2024-01-17 09:15:00,completed,2
+CASE023,60,F,Bone pain,"bone pain in back and ribs, fatigue, recurrent infections",anemia,2024-01-17 10:00:00,completed,3
+CASE024,44,M,Persistent cough with blood,"cough with blood-tinged sputum, chest pain, shortness of breath, weight loss",smoker 20 years,2024-01-17 10:45:00,completed,2
+CASE025,29,F,Seizure,"sudden seizure, confusion after, headache, no prior history",head injury 2 weeks ago,2024-01-17 11:30:00,completed,1
+CASE026,52,M,Yellow skin,"yellowing of skin and eyes, dark urine, pale stools, abdominal pain",alcohol use,2024-01-17 12:15:00,completed,2
+CASE027,36,F,Sudden severe headache,"sudden severe headache like thunderclap, neck stiffness, sensitivity to light",no prior headache history,2024-01-17 13:00:00,completed,1
+CASE028,68,M,Cognitive decline,"progressive confusion, memory loss, wandering, personality changes",hypertension; diabetes,2024-01-17 13:45:00,completed,3
+CASE029,22,F,Extreme thirst and urination,"extreme thirst, frequent urination, weight loss despite increased appetite, fatigue",family history diabetes,2024-01-17 14:30:00,completed,1
+CASE030,54,F,Butterfly rash,"red butterfly-shaped rash on face, joint pain, fatigue, fever",family history lupus,2024-01-17 15:15:00,completed,2
