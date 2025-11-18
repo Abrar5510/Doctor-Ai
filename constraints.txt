@@ -1,0 +1,5 @@
+# Constraints file to ensure setuptools compatibility with Python 3.12+
+# Use this file with: pip install -r requirements.txt -c constraints.txt
+# or set: export PIP_CONSTRAINT=constraints.txt
+
+setuptools>=70.0.0

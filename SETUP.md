@@ -15,7 +15,7 @@ Quick reference for common setup issues and solutions.
    cd Doctor-Ai
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+   pip install -r requirements.txt -c constraints.txt
    ```
 
 3. **Start Services**
@@ -26,6 +26,21 @@ Quick reference for common setup issues and solutions.
    ```
 
 ## Common Issues
+
+### Python 3.12+ Compatibility
+
+If you encounter `ModuleNotFoundError: No module named 'distutils'` during installation:
+
+```bash
+# Always use the constraints file
+pip install -r requirements.txt -c constraints.txt
+
+# Or set it as an environment variable
+export PIP_CONSTRAINT=constraints.txt
+pip install -r requirements.txt
+```
+
+The constraints file ensures setuptools>=70.0.0 is used, which is compatible with Python 3.12+.
 
 ### Docker Credential Error
 
