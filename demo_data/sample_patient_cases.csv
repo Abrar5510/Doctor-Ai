@@ -29,3 +29,23 @@ CASE027,36,F,Sudden severe headache,"sudden severe headache like thunderclap, ne
 CASE028,68,M,Cognitive decline,"progressive confusion, memory loss, wandering, personality changes",hypertension; diabetes,2024-01-17 13:45:00,completed,3
 CASE029,22,F,Extreme thirst and urination,"extreme thirst, frequent urination, weight loss despite increased appetite, fatigue",family history diabetes,2024-01-17 14:30:00,completed,1
 CASE030,54,F,Butterfly rash,"red butterfly-shaped rash on face, joint pain, fatigue, fever",family history lupus,2024-01-17 15:15:00,completed,2
+CASE031,47,M,Crushing chest pressure,"crushing chest pressure, pain radiating to jaw, cold sweats, nausea, shortness of breath",diabetes; smoking history,2024-01-18 08:30:00,completed,1
+CASE032,31,F,Sudden numbness,"sudden numbness in left arm and leg, drooping left side of face, slurred speech",oral contraceptive use,2024-01-18 09:15:00,completed,1
+CASE033,59,M,Severe back pain,"severe lower back pain radiating down right leg, numbness in foot, difficulty walking",chronic back pain,2024-01-18 10:00:00,completed,2
+CASE034,24,F,Recurrent urinary infections,"painful urination, blood in urine, lower abdominal pain, frequent urination",3rd UTI this year,2024-01-18 10:45:00,completed,2
+CASE035,66,F,Painful swollen joint,"red, hot, swollen big toe, severe pain, difficulty walking",history of gout,2024-01-18 11:30:00,completed,1
+CASE036,41,M,Persistent indigestion,"burning chest pain after meals, difficulty swallowing, regurgitation, cough at night",obesity,2024-01-18 12:15:00,completed,2
+CASE037,18,F,Irregular heartbeat,"racing heart, palpitations, dizziness, shortness of breath with exertion",family history of heart disease,2024-01-18 13:00:00,completed,2
+CASE038,73,M,Confusion and falls,"increasing confusion, multiple falls, unsteady gait, urinary incontinence",recent fall,2024-01-18 13:45:00,completed,3
+CASE039,27,F,Severe abdominal cramping,"severe cramping lower abdominal pain, bloody diarrhea, weight loss, fatigue",family history IBD,2024-01-18 14:30:00,completed,2
+CASE040,53,M,Chronic nasal congestion,"chronic nasal congestion, facial pain and pressure, reduced sense of smell, postnasal drip",allergies,2024-01-18 15:15:00,completed,2
+CASE041,39,F,Excessive bleeding,"heavy menstrual bleeding, prolonged periods, fatigue, pale skin",anemia,2024-01-19 08:30:00,completed,2
+CASE042,61,M,Difficulty swallowing,"progressive difficulty swallowing solids then liquids, weight loss, regurgitation",smoking history,2024-01-19 09:15:00,completed,2
+CASE043,34,F,Severe mood swings,"severe mood swings, racing thoughts, decreased need for sleep, impulsive behavior",previous depression,2024-01-19 10:00:00,completed,2
+CASE044,49,M,Chronic heel pain,"severe heel pain worse in morning, pain after prolonged standing",obesity; recent increase in activity,2024-01-19 10:45:00,completed,2
+CASE045,26,F,Persistent pelvic pain,"chronic pelvic pain, painful periods, pain during intercourse, infertility",trying to conceive 2 years,2024-01-19 11:30:00,completed,2
+CASE046,57,M,Vision changes,"gradual vision loss, seeing halos around lights, difficulty seeing at night",diabetes,2024-01-19 12:15:00,completed,2
+CASE047,43,F,Swollen lymph nodes,"painless swollen lymph nodes in neck, night sweats, unexplained weight loss, fatigue",recent infection,2024-01-19 13:00:00,completed,2
+CASE048,69,M,Chronic constipation,"chronic constipation, abdominal pain, bloating, weight loss, blood in stool",change in bowel habits,2024-01-19 13:45:00,completed,2
+CASE049,32,F,Severe acne,"severe cystic acne, irregular periods, excess facial hair, weight gain",PCOS suspected,2024-01-19 14:30:00,completed,2
+CASE050,64,M,Persistent hoarseness,"persistent hoarseness over 3 weeks, throat pain, difficulty swallowing, weight loss",smoking 40 years,2024-01-19 15:15:00,completed,2
