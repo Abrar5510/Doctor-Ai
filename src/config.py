@@ -5,6 +5,7 @@ Configuration management for the Medical Symptom Constellation Mapper
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
@@ -36,8 +37,18 @@ class Settings(BaseSettings):
     rate_limit_period: int = 60  # seconds
 
     # Database
-    database_url: str  # REQUIRED: Must be set via environment variable
+    # REQUIRED: Must be set via DATABASE_URL environment variable
+    # For Vercel Postgres, automatically falls back to POSTGRES_URL_NON_POOLING
+    database_url: str = None
     database_echo: bool = False
+
+    def __init__(self, **kwargs):
+        # Check for Vercel Postgres environment variable if DATABASE_URL not set
+        if 'database_url' not in kwargs and not os.getenv('DATABASE_URL'):
+            vercel_db_url = os.getenv('POSTGRES_URL_NON_POOLING')
+            if vercel_db_url:
+                kwargs['database_url'] = vercel_db_url
+        super().__init__(**kwargs)
 
     # Qdrant Vector Database
     qdrant_host: str = "localhost"
