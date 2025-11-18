@@ -279,15 +279,14 @@ databases:
     databaseName: doctor_ai
     user: doctor_ai_user
     region: oregon
-    plan: starter  # $7/month - includes 1GB storage, automatic backups
-    # Upgrade to 'standard' ($20/month) for production with more storage
+    # Note: Render will use the default paid plan (starts at $7/month)
+    # Includes 1GB storage and automatic daily backups
+    # Upgrade options available in Render dashboard for more storage/features
 
-    # Database version
     ipAllowList: []  # Empty = allow connections from all Render services
 
-    # Automatic daily backups (retention based on plan)
-    # Starter: 7 days
-    # Standard: 30 days
+    # Automatic daily backups included with all paid plans
+    # Backup retention varies by plan tier
 
 # ============================================================================
 # Additional Services (External)
@@ -358,13 +357,13 @@ databases:
 # ============================================================================
 #
 # Minimal Setup (Demo/Testing):
-# - PostgreSQL Starter:        $7/month
+# - PostgreSQL (Basic):        $7/month
 # - Backend Starter (512MB):   $7/month
 # - Frontend Static:           FREE
 # - Total:                     ~$14/month
 #
 # Recommended Setup (Production):
-# - PostgreSQL Standard:       $20/month
+# - PostgreSQL (Standard):     $20/month
 # - Backend Standard (2GB):    $25/month
 # - Frontend Static:           FREE
 # - Qdrant Cloud Starter:      $25/month
@@ -372,7 +371,7 @@ databases:
 # - Total:                     ~$75/month
 #
 # Enterprise Setup:
-# - PostgreSQL Pro:            $90/month
+# - PostgreSQL (Pro):          $90/month
 # - Backend Pro (4GB+):        $85/month
 # - Frontend Static:           FREE
 # - Qdrant Cloud Growth:       $95/month
