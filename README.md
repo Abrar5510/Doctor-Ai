@@ -31,7 +31,7 @@ Doctor-AI helps healthcare professionals by:
 - **ML/NLP**: BioBERT, PubMedBERT, Transformers
 - **Frontend**: React 18, Vite, responsive design
 - **Data**: PostgreSQL, Redis caching
-- **Deployment**: Docker, Render.com ready
+- **Deployment**: Docker, containerized deployment
 
 ## Quick Start
 
@@ -188,38 +188,49 @@ ENABLE_RED_FLAG_ALERTS=True
 
 ## Deployment
 
-### Vercel (Frontend) + Backend Service (Recommended)
+### Docker (Recommended)
 
-Deploy the frontend to Vercel's global CDN and backend to any platform:
+The application is fully containerized and can run anywhere:
 
 ```bash
-# Deploy frontend to Vercel
-vercel --prod
+# Build and run all services
+docker compose up -d
 
-# Backend can be deployed to:
-# - Render.com (see RENDER_DEPLOYMENT.md)
-# - Railway.app
-# - Fly.io
-# - Any platform supporting Python/FastAPI
+# Or build the backend image separately
+docker build -t doctor-ai:latest .
+docker run -p 8000:8000 doctor-ai:latest
 ```
 
-**Complete guide**: See `VERCEL_DEPLOYMENT.md` for detailed instructions
+### Frontend Deployment (Optional)
 
-**Quick Deploy**:
-1. Push to GitHub
-2. Connect to Vercel dashboard
-3. Add `VITE_API_URL` environment variable
-4. Deploy!
+Deploy the frontend to any static hosting service:
 
-### Render.com (Full Stack)
-
-One-click deployment included - see `render.yaml` and `RENDER_DEPLOYMENT.md`
-
-### Docker
-
+**Vercel**:
 ```bash
-docker build -t doctor-ai:latest .
-docker compose up -d
+vercel --prod
+```
+
+**Netlify**:
+```bash
+cd frontend
+npm run build
+netlify deploy --prod --dir=dist
+```
+
+**Or serve from the same container** - See `docker-compose.yml` for configuration
+
+### Environment Variables
+
+For production deployment, configure:
+```bash
+# Backend
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+REDIS_HOST=your-redis-host
+QDRANT_HOST=your-qdrant-host
+SECRET_KEY=your-secret-key
+
+# Frontend (optional - defaults to http://localhost:8000)
+VITE_API_URL=https://your-backend-url.com
 ```
 
 ## Architecture
@@ -255,7 +266,6 @@ All diagnostic suggestions require human review and clinical validation.
 ## Additional Documentation
 
 - **Vercel Deployment**: `VERCEL_DEPLOYMENT.md`
-- **Render Deployment**: `RENDER_DEPLOYMENT.md`
 - **Deployment Guide**: `DEPLOYMENT.md`
 - **Testing Guide**: `TESTING.md`
 - **Security Policy**: `SECURITY.md`
