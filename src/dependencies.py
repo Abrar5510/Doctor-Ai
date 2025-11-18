@@ -13,7 +13,7 @@ from .services.diagnostic import DiagnosticService
 from .services.ai_assistant import AIReasoningAssistant
 from .utils.audit import AuditLogger
 from .config import get_settings
-from .database.connection import get_db, SessionLocal
+from .database import get_db, SessionLocal
 from sqlalchemy.orm import Session
 from loguru import logger
 

@@ -138,7 +138,7 @@ class AuditLog(Base):
 
     # Additional context
     description = Column(Text, nullable=True)
-    metadata = Column(Text, nullable=True)  # JSON string for additional data
+    metadata_json = Column(Text, nullable=True)  # JSON string for additional data
     error_message = Column(Text, nullable=True)
 
     # Timing
