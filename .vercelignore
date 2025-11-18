@@ -1,8 +1,8 @@
 # Python backend (not deployed to Vercel)
-src/
-tests/
-alembic/
-scripts/
+/src/
+/tests/
+/alembic/
+/scripts/
 *.py
 requirements.txt
 runtime.txt
