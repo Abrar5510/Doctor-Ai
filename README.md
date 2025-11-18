@@ -50,8 +50,8 @@ cd Doctor-Ai
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies (with constraints for Python 3.12+ compatibility)
-pip install -r requirements.txt -c constraints.txt
+# Install dependencies
+pip install -r requirements.txt
 ```
 
 ### 2. Setup Services

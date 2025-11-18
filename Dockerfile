@@ -8,11 +8,11 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and constraints
-COPY requirements.txt constraints.txt ./
+# Copy requirements
+COPY requirements.txt ./
 
-# Install Python dependencies with constraints
-RUN pip install --no-cache-dir -r requirements.txt -c constraints.txt
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Download spaCy model
 RUN python -m spacy download en_core_web_sm
