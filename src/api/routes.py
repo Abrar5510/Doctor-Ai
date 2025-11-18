@@ -2,7 +2,7 @@
 Enhanced API routes with AI reasoning assistant
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status, Query
+from fastapi import APIRouter, HTTPException, Depends, status, Query, Header
 from typing import List, Optional
 from loguru import logger
 
@@ -32,19 +32,25 @@ router = APIRouter()
     response_model=DiagnosticResult,
     status_code=status.HTTP_200_OK,
     summary="Analyze patient symptoms and generate differential diagnosis",
-    description="Main diagnostic endpoint that analyzes patient symptoms and returns ranked differential diagnoses",
+    description="Main diagnostic endpoint that analyzes patient symptoms and returns ranked differential diagnoses. Optionally supports AI-powered analysis with custom API keys.",
 )
 async def analyze_patient_case(
     patient_case: PatientCase,
     current_user: User = Depends(get_current_user),
     service: DiagnosticService = Depends(get_diagnostic_service),
     audit: AuditLogger = Depends(get_audit_logger),
+    x_openai_key: Optional[str] = Header(None, alias="X-OpenAI-Key"),
+    x_openrouter_key: Optional[str] = Header(None, alias="X-OpenRouter-Key"),
 ):
     """
     Analyze patient case and generate differential diagnosis
 
     **Input**: PatientCase with symptoms, demographics, and medical history
     **Output**: DiagnosticResult with ranked differential diagnoses, confidence scores, and recommendations
+
+    **Optional Headers for AI-Enhanced Analysis:**
+    - `X-OpenAI-Key`: Your OpenAI API key for GPT-4 powered insights
+    - `X-OpenRouter-Key`: Your OpenRouter API key for multi-model access
 
     **Review Tiers**:
     - Tier 1 (>85% confidence): Automated assessment
@@ -59,6 +65,35 @@ async def analyze_patient_case(
 
         # Perform diagnostic analysis
         result = service.analyze_patient_case(patient_case)
+
+        # If API keys are provided, enhance with AI reasoning
+        if (x_openai_key or x_openrouter_key) and result.differential_diagnoses:
+            try:
+                logger.info("API key provided, enabling AI-enhanced analysis")
+
+                # Initialize AI assistant with user-provided key
+                if x_openrouter_key:
+                    from openai import AsyncOpenAI
+                    ai_client = AsyncOpenAI(
+                        api_key=x_openrouter_key,
+                        base_url="https://openrouter.ai/api/v1"
+                    )
+                    ai = AIReasoningAssistant(api_key=x_openrouter_key, use_local=False)
+                elif x_openai_key:
+                    ai = AIReasoningAssistant(api_key=x_openai_key, use_local=False)
+
+                # Generate AI explanation
+                explanation = await ai.generate_detailed_explanation(patient_case, result)
+
+                # Add AI insights to the result
+                if not hasattr(result, 'ai_insights'):
+                    result.ai_insights = {}
+                result.ai_insights['explanation'] = explanation
+                logger.info("AI-enhanced analysis completed successfully")
+
+            except Exception as ai_error:
+                logger.warning(f"AI enhancement failed, continuing with standard analysis: {ai_error}")
+                # Continue with standard result if AI fails
 
         # Log to audit trail
         audit.log_diagnostic_analysis(
