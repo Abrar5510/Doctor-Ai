@@ -201,38 +201,20 @@ docker build -t doctor-ai:latest .
 docker run -p 8000:8000 doctor-ai:latest
 ```
 
-### Vercel Deployment (Frontend + Backend)
+### Vercel Deployment
 
-Deploy both frontend and backend to Vercel as separate projects:
+Deploy to Vercel for global CDN performance:
 
-**Quick Start**:
 ```bash
-# Deploy backend
-vercel --prod --name doctor-ai-backend
-
 # Deploy frontend
-vercel --prod --name doctor-ai-frontend
-```
-
-See **[DEPLOYMENT_QUICK_START.md](./DEPLOYMENT_QUICK_START.md)** for step-by-step guide.
-
-### Frontend Only Deployment
-
-Deploy the frontend to any static hosting service:
-
-**Vercel**:
-```bash
 vercel --prod
 ```
 
-**Netlify**:
-```bash
-cd frontend
-npm run build
-netlify deploy --prod --dir=dist
-```
-
-**Or serve from the same container** - See `docker-compose.yml` for configuration
+See **[docs/VERCEL_DEPLOYMENT.md](./docs/VERCEL_DEPLOYMENT.md)** for complete deployment options including:
+- Separate frontend and backend deployments
+- Hybrid deployment (frontend on Vercel, backend self-hosted)
+- Environment variable configuration
+- External services setup (PostgreSQL, Redis, Qdrant)
 
 ### Environment Variables
 
@@ -258,7 +240,7 @@ Client → FastAPI → Diagnostic Engine → Qdrant Vector DB
                  → Redis (caching)
 ```
 
-**For detailed architecture**: See `ARCHITECTURE.md`
+**For detailed architecture**: See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
 ## Clinical Decision Support Notice
 
@@ -278,20 +260,18 @@ All diagnostic suggestions require human review and clinical validation.
 - ✅ Role-based access control ready
 - ✅ Complete audit trail
 
-## Additional Documentation
+## Documentation
 
-### Deployment Guides
-- **Quick Start**: `DEPLOYMENT_QUICK_START.md` - Fast Vercel deployment
-- **Separate Vercel Projects**: `VERCEL_SEPARATE_DEPLOYMENTS.md` - Frontend + Backend on Vercel
-- **Hybrid Deployment**: `VERCEL_DEPLOYMENT.md` - Frontend on Vercel, Backend elsewhere
-- **General Deployment**: `DEPLOYMENT.md` - All deployment options
+Comprehensive documentation is available in the `docs/` folder:
 
-### Other Documentation
-- **Testing Guide**: `TESTING.md`
-- **Security Policy**: `SECURITY.md`
-- **Demo Guide**: `DEMO_GUIDE.md`
-- **Architecture Details**: `ARCHITECTURE.md`
-- **Contributing**: `CONTRIBUTING.md`
+- **[Vercel Deployment](./docs/VERCEL_DEPLOYMENT.md)** - Complete Vercel deployment guide
+- **[General Deployment](./docs/DEPLOYMENT.md)** - Docker, AWS, GCP, Azure deployment options
+- **[Architecture](./docs/ARCHITECTURE.md)** - System architecture and design
+- **[Testing Guide](./docs/TESTING.md)** - Testing strategies and test suite
+- **[Security Policy](./docs/SECURITY.md)** - Security best practices
+- **[Contributing](./docs/CONTRIBUTING.md)** - How to contribute to the project
+- **[Demo Guide](./docs/DEMO_GUIDE.md)** - Using the demo data and features
+- **[Medical Datasets](./docs/MEDICAL_DATASETS.md)** - Information about medical data sources
 
 ## License
 
