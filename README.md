@@ -201,7 +201,22 @@ docker build -t doctor-ai:latest .
 docker run -p 8000:8000 doctor-ai:latest
 ```
 
-### Frontend Deployment (Optional)
+### Vercel Deployment (Frontend + Backend)
+
+Deploy both frontend and backend to Vercel as separate projects:
+
+**Quick Start**:
+```bash
+# Deploy backend
+vercel --prod --name doctor-ai-backend
+
+# Deploy frontend
+vercel --prod --name doctor-ai-frontend
+```
+
+See **[DEPLOYMENT_QUICK_START.md](./DEPLOYMENT_QUICK_START.md)** for step-by-step guide.
+
+### Frontend Only Deployment
 
 Deploy the frontend to any static hosting service:
 
@@ -265,8 +280,13 @@ All diagnostic suggestions require human review and clinical validation.
 
 ## Additional Documentation
 
-- **Vercel Deployment**: `VERCEL_DEPLOYMENT.md`
-- **Deployment Guide**: `DEPLOYMENT.md`
+### Deployment Guides
+- **Quick Start**: `DEPLOYMENT_QUICK_START.md` - Fast Vercel deployment
+- **Separate Vercel Projects**: `VERCEL_SEPARATE_DEPLOYMENTS.md` - Frontend + Backend on Vercel
+- **Hybrid Deployment**: `VERCEL_DEPLOYMENT.md` - Frontend on Vercel, Backend elsewhere
+- **General Deployment**: `DEPLOYMENT.md` - All deployment options
+
+### Other Documentation
 - **Testing Guide**: `TESTING.md`
 - **Security Policy**: `SECURITY.md`
 - **Demo Guide**: `DEMO_GUIDE.md`

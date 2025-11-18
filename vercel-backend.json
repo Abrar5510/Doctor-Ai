@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "doctor-ai-backend",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "regions": ["iad1"],
+  "env": {
+    "ENVIRONMENT": "production",
+    "DATABASE_URL": "@database_url",
+    "REDIS_URL": "@redis_url",
+    "QDRANT_URL": "@qdrant_url",
+    "QDRANT_API_KEY": "@qdrant_api_key",
+    "SECRET_KEY": "@secret_key",
+    "CORS_ORIGINS": "@cors_origins"
+  }
+}
