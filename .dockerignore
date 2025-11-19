@@ -43,6 +43,10 @@ pytest.ini
 .coverage
 htmlcov/
 
+# Node modules (will be installed during build)
+node_modules/
+frontend/node_modules/
+
 # Logs
 *.log
 logs/
