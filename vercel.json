@@ -47,5 +47,6 @@
       "dest": "/index.html"
     }
   ],
+  "outputDirectory": "frontend/dist",
   "regions": ["iad1"]
 }
