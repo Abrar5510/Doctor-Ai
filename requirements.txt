@@ -17,8 +17,6 @@ qdrant-client==1.7.3
 # ML & NLP - Removed heavy dependencies for Vercel compatibility
 # Medical professionals use proper terminology, so semantic search not needed
 # transformers, torch, sentence-transformers removed (~3GB saved)
-spacy==3.7.2  # Kept for NER and text processing
-scikit-learn==1.3.2  # Kept for basic calculations
 numpy==1.26.2  # Kept for array operations (lightweight)
 
 # Database
@@ -34,7 +32,6 @@ python-dotenv==1.0.0
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 httpx==0.25.2
-aiofiles==23.2.1
 
 # Logging & Monitoring
 loguru==0.7.2
