@@ -1,0 +1,79 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║                 DOCTOR-AI DATABASE - CSV DATA FILES                  ║
+║                                                                      ║
+║          All application data stored in human-readable CSV           ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📊 DATA FILES (8 Collections)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. medical_conditions.csv (15 records)
+   ├─ Medical knowledge base with symptoms and diagnostic criteria
+   ├─ ICD-10 codes, SNOMED-CT codes
+   ├─ Typical symptoms, rare symptoms, red flag symptoms
+   ├─ Recommended tests, specialist referrals
+   └─ Evidence sources and clinical guidelines
+
+2. patient_cases.csv (15 records)
+   ├─ Patient case records with demographics
+   ├─ Chief complaints and symptom presentations
+   ├─ Medical history and family history
+   └─ Diagnosis results and review tiers
+
+3. diagnosis_records.csv (20 records)
+   ├─ Differential diagnosis results
+   ├─ Confidence scores and similarity scores
+   ├─ Matching symptoms and supporting evidence
+   └─ Physician confirmation and notes
+
+4. users.csv (8 records)
+   ├─ User accounts (admins, physicians, nurses, researchers, API users)
+   ├─ Authentication data (hashed passwords)
+   ├─ Security fields (failed login attempts, verification tokens)
+   └─ Audit timestamps
+
+5. api_keys.csv (5 records)
+   ├─ API keys for programmatic access
+   ├─ Key hashes and prefixes
+   ├─ Scopes and rate limits
+   └─ Usage tracking and expiration dates
+
+6. audit_logs.csv (15 records)
+   ├─ HIPAA-compliant audit trail
+   ├─ User actions (login, create_case, run_diagnosis, etc.)
+   ├─ Request metadata (IP, user agent, method, path)
+   └─ Timestamps and duration
+
+7. user_sessions.csv (8 records)
+   ├─ Active user sessions
+   ├─ JWT token IDs
+   ├─ Session metadata (IP address, user agent, device info)
+   └─ Lifecycle timestamps
+
+8. system_metrics.csv (20 records)
+   ├─ Performance and usage metrics
+   ├─ Query latencies, embedding times, cache hit rates
+   ├─ Database query times and API request counts
+   └─ Endpoint-specific metrics
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 TOTAL: 106 records across 8 collections
+
+🎯 PURPOSE:
+   - Version-controlled database (Git)
+   - Human-readable and editable
+   - Source of truth for all application data
+   - Loaded into Qdrant Cloud for semantic search
+
+🔄 LOADING DATA:
+   Run: python scripts/init_qdrant.py
+
+📖 DOCUMENTATION:
+   - Setup guide: ../QDRANT_SETUP.md
+   - Architecture: ../QDRANT_ARCHITECTURE.md
+   - This directory: README.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

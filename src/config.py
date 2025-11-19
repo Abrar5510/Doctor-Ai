@@ -3,33 +3,8 @@ Configuration management for the Medical Symptom Constellation Mapper
 """
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, field_validator, model_validator
 from functools import lru_cache
 from typing import Optional
-import os
-
-
-def get_database_url() -> str:
-    """
-    Get database URL with Vercel Postgres fallback.
-
-    Priority:
-    1. DATABASE_URL environment variable
-    2. POSTGRES_URL_NON_POOLING (Vercel Postgres automatic variable)
-    3. POSTGRES_URL (Vercel Postgres pooled connection)
-    """
-    db_url = os.getenv('DATABASE_URL')
-    if db_url:
-        return db_url
-
-    # Fallback to Vercel Postgres environment variables
-    db_url = os.getenv('POSTGRES_URL_NON_POOLING') or os.getenv('POSTGRES_URL')
-    if db_url:
-        return db_url
-
-    # If no database URL is found, return empty string
-    # The validation will catch this and provide a helpful error
-    return ""
 
 
 class Settings(BaseSettings):
@@ -66,16 +41,9 @@ class Settings(BaseSettings):
     rate_limit_requests: int = 100  # requests per minute
     rate_limit_period: int = 60  # seconds
 
-    # Database Configuration
-    # PRIMARY DATABASE: Set to "qdrant" to use Qdrant as main database, or "postgresql" for PostgreSQL
-    primary_database: str = "qdrant"  # Options: "qdrant" or "postgresql"
-
-    # PostgreSQL Database (Legacy/Optional)
-    # Automatically uses POSTGRES_URL_NON_POOLING or POSTGRES_URL if DATABASE_URL not set
-    database_url: str = Field(default_factory=get_database_url)
-    database_echo: bool = False
-
-    # Qdrant Vector Database (PRIMARY DATABASE)
+    # Primary Database: Qdrant Vector Database
+    # For production: Use Qdrant Cloud (https://cloud.qdrant.io/)
+    # For local dev: Use 'localhost' with Docker
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     qdrant_api_key: Optional[str] = None
@@ -149,23 +117,12 @@ class Settings(BaseSettings):
         return True
 
     def validate_database_config(self) -> bool:
-        """Validate database configuration based on primary_database setting."""
-        if self.primary_database == "qdrant":
-            # Qdrant is primary - ensure it's configured
-            if not self.qdrant_host:
-                raise ValueError("QDRANT_HOST must be set when using Qdrant as primary database")
-        elif self.primary_database == "postgresql":
-            # PostgreSQL is primary - ensure it's configured
-            if not self.database_url:
-                raise ValueError(
-                    "Database URL not configured. Please set one of:\n"
-                    "  - DATABASE_URL environment variable\n"
-                    "  - Connect Vercel Postgres to your project (provides POSTGRES_URL automatically)"
-                )
-        else:
+        """Validate Qdrant database configuration."""
+        if not self.qdrant_host:
             raise ValueError(
-                f"Invalid primary_database value: {self.primary_database}. "
-                "Must be 'qdrant' or 'postgresql'"
+                "QDRANT_HOST must be set.\n"
+                "For production: Use Qdrant Cloud (https://cloud.qdrant.io/)\n"
+                "For local dev: Use 'localhost' with Docker"
             )
         return True
 

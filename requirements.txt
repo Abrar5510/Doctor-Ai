@@ -12,19 +12,14 @@ pydantic==2.5.0
 pydantic-settings==2.1.0
 
 # Vector Database & ML Libraries
-# REQUIRED: Qdrant is now the primary database (replacing PostgreSQL)
+# REQUIRED: Qdrant is the primary database
 # ML libraries needed for generating embeddings for semantic search
 qdrant-client==1.7.3
 transformers==4.35.2
 torch==2.1.1
 numpy==1.26.2
 
-# Database
-sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
-alembic==1.12.1
-
-# Caching
+# Caching (Optional)
 redis==5.0.1
 
 # Utilities

@@ -25,32 +25,6 @@ services:
     profiles:
       - local-dev
 
-  # PostgreSQL Database - LOCAL DEVELOPMENT ONLY (OPTIONAL)
-  # For production on Vercel, use Vercel Postgres instead
-  postgres:
-    image: postgres:15-alpine
-    container_name: doctor-ai-postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-doctor_ai}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_secure_password}
-      POSTGRES_DB: ${POSTGRES_DB:-doctor_ai}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U doctor_ai -d doctor_ai"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
-    networks:
-      - doctor-ai-network
-    profiles:
-      - local-dev
-
   # Redis Cache - LOCAL DEVELOPMENT ONLY (OPTIONAL)
   redis:
     image: redis:7-alpine
@@ -85,10 +59,9 @@ services:
       PRIMARY_DATABASE: qdrant
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
-      DATABASE_URL: postgresql://${POSTGRES_USER:-doctor_ai}:${POSTGRES_PASSWORD:-changeme_secure_password}@postgres:5432/${POSTGRES_DB:-doctor_ai}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_ENABLED: ${REDIS_ENABLED:-true}
+      REDIS_ENABLED: ${REDIS_ENABLED:-false}
       SECRET_KEY: ${SECRET_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     env_file:
@@ -118,5 +91,4 @@ networks:
 
 volumes:
   qdrant_storage:
-  postgres_data:
   redis_data:
