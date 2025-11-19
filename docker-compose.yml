@@ -1,5 +1,6 @@
 services:
-  # Qdrant Vector Database
+  # Qdrant Vector Database (OPTIONAL - only needed for ML version)
+  # ML-free version uses PostgreSQL for keyword search instead
   qdrant:
     image: qdrant/qdrant:v1.7.4
     container_name: doctor-ai-qdrant
@@ -20,6 +21,9 @@ services:
     restart: unless-stopped
     networks:
       - doctor-ai-network
+    # Only start if using ML version
+    profiles:
+      - ml-version
 
   # PostgreSQL Database
   postgres:
@@ -83,12 +87,11 @@ services:
     env_file:
       - .env
     depends_on:
-      qdrant:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      # Qdrant removed - not needed for ML-free version
     volumes:
       - ./logs:/app/logs
     healthcheck:

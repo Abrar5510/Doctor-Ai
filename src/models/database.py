@@ -316,26 +316,50 @@ class SystemMetrics(Base):
         return f"<SystemMetrics(id={self.id}, type='{self.metric_type}', value={self.metric_value})>"
 
 
-class CachedEmbedding(Base):
-    """Cache for vector embeddings to reduce computation."""
+class MedicalCondition(Base):
+    """Medical condition model for keyword-based diagnostic search."""
 
-    __tablename__ = "cached_embeddings"
+    __tablename__ = "medical_conditions"
 
     id = Column(Integer, primary_key=True, index=True)
+    condition_id = Column(String(100), unique=True, index=True, nullable=False)
+    condition_name = Column(String(500), nullable=False, index=True)
 
-    # Text that was embedded
-    text_hash = Column(String(64), unique=True, index=True, nullable=False)  # SHA-256 hash
-    text_content = Column(Text, nullable=False)
+    # Medical codes
+    icd_codes_json = Column(Text, nullable=True)  # JSON array of ICD-10 codes
+    snomed_codes_json = Column(Text, nullable=True)  # JSON array of SNOMED codes
 
-    # Embedding data
-    embedding_json = Column(Text, nullable=False)  # JSON array of floats
-    embedding_model = Column(String(255), nullable=False)
-    vector_dimension = Column(Integer, nullable=False)
+    # Symptoms
+    typical_symptoms_json = Column(Text, nullable=False)  # JSON array
+    rare_symptoms_json = Column(Text, nullable=True)  # JSON array
+    red_flag_symptoms_json = Column(Text, nullable=True)  # JSON array
 
-    # Cache metadata
-    access_count = Column(Integer, default=1, nullable=False)
-    last_accessed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    # Full-text search column (for PostgreSQL tsvector)
+    symptoms_searchable = Column(Text, nullable=False)  # Space-separated symptoms for search
+
+    # Disease classification
+    prevalence = Column(Integer, nullable=True)  # Stored as integer (prevalence * 1000000)
+    is_rare_disease = Column(Boolean, default=False, nullable=False, index=True)
+    urgency_level = Column(String(50), nullable=False)  # routine, urgent, emergency
+
+    # Clinical information
+    temporal_pattern = Column(Text, nullable=True)
+    diagnostic_criteria_json = Column(Text, nullable=True)  # JSON array
+    differential_diagnoses_json = Column(Text, nullable=True)  # JSON array
+    recommended_tests_json = Column(Text, nullable=True)  # JSON array
+    specialist_referral = Column(String(255), nullable=True)
+    distinguishing_features_json = Column(Text, nullable=True)  # JSON array
+
+    # Evidence and sources
+    evidence_sources_json = Column(Text, nullable=True)  # JSON array
+
+    # Age and sex predilection
+    typical_age_range = Column(String(100), nullable=True)
+    sex_predilection = Column(String(50), nullable=True)
+
+    # Metadata
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def __repr__(self):
-        return f"<CachedEmbedding(id={self.id}, model='{self.embedding_model}', accesses={self.access_count})>"
+        return f"<MedicalCondition(id={self.id}, name='{self.condition_name}', rare={self.is_rare_disease})>"
