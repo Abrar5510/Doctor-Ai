@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "doctor-ai",
-  "outputDirectory": "frontend/dist",
   "builds": [
     {
       "src": "api/index.py",
@@ -29,8 +28,12 @@
   ],
   "routes": [
     {
-      "src": "/api/init_database",
+      "src": "/api/v1/init_database",
       "dest": "/api/init_database.py"
+    },
+    {
+      "src": "/api/v1/(.*)",
+      "dest": "/api/index.py"
     },
     {
       "src": "/api/(.*)",
@@ -38,10 +41,6 @@
     },
     {
       "handle": "filesystem"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|svg|ico|json|woff|woff2|ttf|eot))",
-      "dest": "/$1"
     },
     {
       "src": "/(.*)",
