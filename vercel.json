@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "doctor-ai",
-  "outputDirectory": "frontend/dist",
   "builds": [
     {
       "src": "api/index.py",
@@ -34,6 +33,22 @@
     },
     {
       "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/docs",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/redoc",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/openapi.json",
       "dest": "/api/index.py"
     },
     {
