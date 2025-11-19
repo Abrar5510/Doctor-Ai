@@ -1,6 +1,7 @@
 services:
-  # Qdrant Vector Database (OPTIONAL - only needed for ML version)
-  # ML-free version uses PostgreSQL for keyword search instead
+  # Qdrant Vector Database - LOCAL DEVELOPMENT ONLY
+  # For production, use Qdrant Cloud (https://cloud.qdrant.io/)
+  # This is optional for local testing before uploading to cloud
   qdrant:
     image: qdrant/qdrant:v1.7.4
     container_name: doctor-ai-qdrant
@@ -21,11 +22,11 @@ services:
     restart: unless-stopped
     networks:
       - doctor-ai-network
-    # Only start if using ML version
     profiles:
-      - ml-version
+      - local-dev
 
-  # PostgreSQL Database
+  # PostgreSQL Database - LOCAL DEVELOPMENT ONLY (OPTIONAL)
+  # For production on Vercel, use Vercel Postgres instead
   postgres:
     image: postgres:15-alpine
     container_name: doctor-ai-postgres
@@ -47,8 +48,10 @@ services:
     restart: unless-stopped
     networks:
       - doctor-ai-network
+    profiles:
+      - local-dev
 
-  # Redis Cache
+  # Redis Cache - LOCAL DEVELOPMENT ONLY (OPTIONAL)
   redis:
     image: redis:7-alpine
     container_name: doctor-ai-redis
@@ -66,8 +69,11 @@ services:
     restart: unless-stopped
     networks:
       - doctor-ai-network
+    profiles:
+      - local-dev
 
-  # FastAPI Application (optional - can run locally for development)
+  # FastAPI Application - LOCAL DEVELOPMENT ONLY
+  # For production, deploy to Vercel as serverless functions
   api:
     build:
       context: .
@@ -76,6 +82,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      PRIMARY_DATABASE: qdrant
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       DATABASE_URL: postgresql://${POSTGRES_USER:-doctor_ai}:${POSTGRES_PASSWORD:-changeme_secure_password}@postgres:5432/${POSTGRES_DB:-doctor_ai}
@@ -87,11 +94,10 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      qdrant:
         condition: service_healthy
       redis:
         condition: service_healthy
-      # Qdrant removed - not needed for ML-free version
     volumes:
       - ./logs:/app/logs
     healthcheck:
@@ -103,9 +109,8 @@ services:
     restart: unless-stopped
     networks:
       - doctor-ai-network
-    # Uncomment to enable the API service
     profiles:
-      - full
+      - local-dev
 
 networks:
   doctor-ai-network:
