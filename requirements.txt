@@ -11,19 +11,13 @@ python-multipart==0.0.6
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# ML & NLP Libraries - ALL REMOVED for Vercel compatibility
-# Medical professionals use proper terminology, so ML/semantic search not needed
-# Removed: torch (~2.5GB), transformers (~500MB), sentence-transformers (~500MB)
-# Removed: numpy (~50MB), spacy (~100MB), scikit-learn (~50MB), qdrant-client (~50MB)
-# Total saved: ~3.75GB
-# These libraries only used in old ML-based services (embedding.py, diagnostic.py, vector_store.py)
-# Vector Database
+# Vector Database & ML Libraries
+# REQUIRED: Qdrant is now the primary database (replacing PostgreSQL)
+# ML libraries needed for generating embeddings for semantic search
 qdrant-client==1.7.3
-
-# ML & NLP - Removed heavy dependencies for Vercel compatibility
-# Medical professionals use proper terminology, so semantic search not needed
-# transformers, torch, sentence-transformers removed (~3GB saved)
-numpy==1.26.2  # Kept for array operations (lightweight)
+transformers==4.35.2
+torch==2.1.1
+numpy==1.26.2
 
 # Database
 sqlalchemy==2.0.23

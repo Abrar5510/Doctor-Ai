@@ -66,24 +66,16 @@ class Settings(BaseSettings):
     rate_limit_requests: int = 100  # requests per minute
     rate_limit_period: int = 60  # seconds
 
-    # Database
+    # Database Configuration
+    # PRIMARY DATABASE: Set to "qdrant" to use Qdrant as main database, or "postgresql" for PostgreSQL
+    primary_database: str = "qdrant"  # Options: "qdrant" or "postgresql"
+
+    # PostgreSQL Database (Legacy/Optional)
     # Automatically uses POSTGRES_URL_NON_POOLING or POSTGRES_URL if DATABASE_URL not set
     database_url: str = Field(default_factory=get_database_url)
     database_echo: bool = False
 
-    @field_validator('database_url')
-    @classmethod
-    def validate_database_url(cls, v: str) -> str:
-        """Validate that database URL is set"""
-        if not v:
-            raise ValueError(
-                "Database URL not configured. Please set one of:\n"
-                "  - DATABASE_URL environment variable\n"
-                "  - Connect Vercel Postgres to your project (provides POSTGRES_URL automatically)"
-            )
-        return v
-
-    # Qdrant Vector Database
+    # Qdrant Vector Database (PRIMARY DATABASE)
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     qdrant_api_key: Optional[str] = None
@@ -156,10 +148,32 @@ class Settings(BaseSettings):
             )
         return True
 
+    def validate_database_config(self) -> bool:
+        """Validate database configuration based on primary_database setting."""
+        if self.primary_database == "qdrant":
+            # Qdrant is primary - ensure it's configured
+            if not self.qdrant_host:
+                raise ValueError("QDRANT_HOST must be set when using Qdrant as primary database")
+        elif self.primary_database == "postgresql":
+            # PostgreSQL is primary - ensure it's configured
+            if not self.database_url:
+                raise ValueError(
+                    "Database URL not configured. Please set one of:\n"
+                    "  - DATABASE_URL environment variable\n"
+                    "  - Connect Vercel Postgres to your project (provides POSTGRES_URL automatically)"
+                )
+        else:
+            raise ValueError(
+                f"Invalid primary_database value: {self.primary_database}. "
+                "Must be 'qdrant' or 'postgresql'"
+            )
+        return True
+
 
 @lru_cache()
 def get_settings() -> Settings:
     """Get cached settings instance"""
     settings = Settings()
     settings.validate_secret_key()
+    settings.validate_database_config()
     return settings

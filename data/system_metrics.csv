@@ -1,0 +1,21 @@
+id,metric_type,metric_name,metric_value,metric_unit,endpoint,user_id,request_id,metadata_json,timestamp
+1,query_latency,Diagnosis Query Time,2341,ms,/api/v1/diagnose,2,req_001,"{""case_id"":""CASE001"",""symptoms_count"":4}",2024-01-15 09:35:00
+2,embedding_time,Symptom Embedding Generation,456,ms,/api/v1/diagnose,2,req_001,"{""model"":""BiomedNLP-PubMedBERT""}",2024-01-15 09:35:00
+3,cache_hit_rate,Redis Cache Hit Rate,85,percentage,/api/v1/cases,5,req_002,"{""cache_type"":""redis""}",2024-01-15 10:30:00
+4,query_latency,Vector Search Time,234,ms,/api/v1/diagnose,6,req_003,"{""top_k"":50}",2024-01-15 11:05:00
+5,database_query,PostgreSQL Query Time,89,ms,/api/v1/cases,2,req_004,"{""query_type"":""SELECT""}",2024-01-15 12:00:00
+6,api_request_count,Total API Requests,150,count,/api/v1/*,,req_aggregate,"{""time_window"":""1h""}",2024-01-15 12:00:00
+7,embedding_time,Medical Condition Embedding,523,ms,/api/v1/diagnose,2,req_005,"{""conditions_count"":50}",2024-01-15 13:00:00
+8,query_latency,Case Retrieval Time,156,ms,/api/v1/cases/1,2,req_006,"{""include_diagnoses"":true}",2024-01-15 14:00:00
+9,cache_hit_rate,Vector Cache Hit Rate,72,percentage,/api/v1/diagnose,6,req_007,"{""cache_type"":""qdrant""}",2024-01-15 15:00:00
+10,database_query,Qdrant Vector Search,178,ms,/api/v1/diagnose,3,req_008,"{""similarity_threshold"":0.7}",2024-01-15 15:35:00
+11,query_latency,Authentication Check,45,ms,/api/v1/auth/verify,5,req_009,"{""method"":""jwt""}",2024-01-15 16:00:00
+12,api_request_count,Failed Requests,3,count,/api/v1/*,,req_aggregate_fail,"{""time_window"":""1h"",""error_codes"":[429,401]}",2024-01-15 16:00:00
+13,embedding_time,Symptom Vector Generation,412,ms,/api/v1/diagnose,6,req_010,"{""symptoms_count"":7}",2024-01-16 10:20:00
+14,query_latency,Full Diagnosis Pipeline,2145,ms,/api/v1/diagnose,6,req_010,"{""pipeline_stages"":[""embedding"",""search"",""ranking""]}",2024-01-16 10:20:00
+15,database_query,Audit Log Insert,23,ms,/api/v1/audit,2,req_011,"{""log_type"":""access""}",2024-01-16 11:00:00
+16,cache_hit_rate,Medical Conditions Cache,91,percentage,/api/v1/conditions,4,req_012,"{""cache_type"":""application""}",2024-01-16 12:00:00
+17,query_latency,User Session Validation,67,ms,/api/v1/auth/session,2,req_013,"{""session_check"":""active""}",2024-01-16 13:00:00
+18,api_request_count,Hourly Request Volume,245,count,/api/v1/*,,req_aggregate_vol,"{""time_window"":""1h"",""peak_hour"":true}",2024-01-16 14:00:00
+19,embedding_time,Batch Embedding Generation,1823,ms,/api/v1/batch/embed,4,req_014,"{""batch_size"":100,""model"":""BiomedNLP-PubMedBERT""}",2024-01-16 15:00:00
+20,query_latency,Export Cases Query,1234,ms,/api/v1/cases/export,2,req_015,"{""export_format"":""csv"",""records"":50}",2024-01-16 16:00:00
