@@ -38,7 +38,17 @@ class QdrantManager:
         vector_size: int = 768,
     ):
         """Initialize Qdrant client and embedding model."""
-        self.client = QdrantClient(host=host, port=port, api_key=api_key)
+        # Support both local and cloud Qdrant instances
+        if api_key and host != "localhost":
+            # Cloud instance with API key
+            self.client = QdrantClient(url=f"https://{host}:{port}", api_key=api_key)
+        elif api_key:
+            # Local instance with API key (secured local)
+            self.client = QdrantClient(host=host, port=port, api_key=api_key)
+        else:
+            # Local instance without API key
+            self.client = QdrantClient(host=host, port=port)
+
         self.vector_size = vector_size
 
         # Initialize embedding model

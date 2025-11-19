@@ -1,154 +1,204 @@
-# Qdrant Database Setup Guide
+# Qdrant Cloud Setup Guide
 
 ## Overview
 
-Doctor-AI now uses **Qdrant as the primary database**, replacing PostgreSQL. This provides powerful semantic search capabilities using vector embeddings generated from medical text.
+Doctor-AI uses **Qdrant Cloud** as the primary database for production deployments (Vercel, Railway, Render, etc.). This provides powerful semantic search capabilities using vector embeddings without requiring Docker or local infrastructure.
 
-## Architecture
+## Why Qdrant Cloud?
 
-### What Changed?
+✅ **Serverless-Compatible** - Works perfectly with Vercel, Railway, Render
+✅ **No Docker Required** - Pure cloud service, no containers needed
+✅ **Free Tier Available** - 1GB free cluster for development
+✅ **Automatic Backups** - Built-in data redundancy
+✅ **Global CDN** - Low-latency access worldwide
+✅ **Fully Managed** - No database maintenance required
 
-- **Before**: PostgreSQL relational database
-- **Now**: Qdrant vector database with semantic search
-- **Data**: All application data stored in CSV files (`/data/`) and loaded into Qdrant
+## Quick Start (5 minutes)
 
-### Benefits
+### Step 1: Create Qdrant Cloud Account
 
-1. **Semantic Search**: Find similar medical conditions using AI embeddings
-2. **Flexible Schema**: Easy to add new fields without migrations
-3. **Performance**: Fast vector similarity search for diagnosis matching
-4. **Scalability**: Horizontal scaling for large medical datasets
-5. **CSV-Based**: All data is version-controlled in CSV format
+1. Go to https://cloud.qdrant.io/
+2. Sign up (free account, no credit card required)
+3. Click **"Create Cluster"**
+4. Choose:
+   - **Free tier** (1GB storage)
+   - **Region** closest to your users
+   - **Cluster name** (e.g., "doctor-ai-prod")
+5. Click **Create**
 
-## Quick Start
+### Step 2: Get Your Credentials
 
-### 1. Start Qdrant with Docker
+Once your cluster is created:
 
-```bash
-# Start Qdrant (and Redis)
-docker-compose up -d qdrant redis
+1. Click on your cluster name
+2. Copy the **Cluster URL** (e.g., `xxxxx.us-east-1.aws.cloud.qdrant.io`)
+3. Go to **API Keys** tab
+4. Click **Generate API Key**
+5. Copy and save the API key securely
 
-# Verify Qdrant is running
-curl http://localhost:6333/
+### Step 3: Configure Environment Variables
+
+#### For Vercel:
+
+1. Go to your Vercel project
+2. Click **Settings** → **Environment Variables**
+3. Add these variables:
+
+```
+PRIMARY_DATABASE=qdrant
+QDRANT_HOST=xxxxx.us-east-1.aws.cloud.qdrant.io
+QDRANT_PORT=6333
+QDRANT_API_KEY=your_api_key_here
+QDRANT_COLLECTION_NAME=medical_conditions
 ```
 
-### 2. Install Python Dependencies
+#### For Local Development:
+
+Create `.env` file:
+
+```bash
+PRIMARY_DATABASE=qdrant
+QDRANT_HOST=xxxxx.us-east-1.aws.cloud.qdrant.io
+QDRANT_PORT=6333
+QDRANT_API_KEY=your_api_key_here
+QDRANT_COLLECTION_NAME=medical_conditions
+SECRET_KEY=your_secret_key_at_least_32_chars_long
+```
+
+### Step 4: Load Data into Qdrant Cloud
+
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Initialize Qdrant Database
+Initialize and load all CSV data:
 
 ```bash
-# Load all CSV data into Qdrant collections
 python scripts/init_qdrant.py
 ```
 
 This will:
-- Create 8 Qdrant collections (users, patient_cases, medical_conditions, etc.)
-- Load data from CSV files in `/data/`
-- Generate embeddings using BiomedNLP-PubMedBERT model
-- Insert all data with vectors into Qdrant
+- ✅ Create 8 collections (users, patient_cases, medical_conditions, etc.)
+- ✅ Load data from `/data/*.csv` files
+- ✅ Generate AI embeddings for semantic search
+- ✅ Upload everything to your Qdrant Cloud cluster
 
-### 4. Verify Data Loaded
-
-```bash
-# Check Qdrant dashboard
-open http://localhost:6333/dashboard
-
-# Or use Python to check:
-python -c "
-from src.database.qdrant_manager import QdrantManager
-manager = QdrantManager()
-print('Collections:')
-for col in ['users', 'patient_cases', 'medical_conditions', 'diagnosis_records']:
-    count = manager.count_points(col)
-    print(f'  {col}: {count} points')
-"
+**Expected output:**
+```
+============================================================
+Initializing Qdrant Collections
+============================================================
+Created collection: users
+Created collection: user_sessions
+Created collection: audit_logs
+...
+============================================================
+Loading Data from CSV Files
+============================================================
+Loading users from data/users.csv...
+  Uploaded 8 points to users
+✓ users: 8 total points
+...
+============================================================
+✓ Data Loading Complete!
+============================================================
 ```
 
-## Data Structure
+### Step 5: Verify Data
 
-### CSV Files in `/data/`
+Check your Qdrant Cloud dashboard:
 
-All application data is stored in CSV files for easy version control:
+1. Go to https://cloud.qdrant.io/
+2. Click on your cluster
+3. Go to **Collections** tab
+4. You should see 8 collections with data:
+   - `medical_conditions` (15 points)
+   - `patient_cases` (15 points)
+   - `diagnosis_records` (20 points)
+   - `users` (8 points)
+   - `api_keys` (5 points)
+   - `audit_logs` (15 points)
+   - `user_sessions` (8 points)
+   - `system_metrics` (20 points)
 
-```
-data/
-├── medical_conditions.csv    # Medical knowledge base (15 conditions)
-├── patient_cases.csv          # Patient case records (15 cases)
-├── diagnosis_records.csv      # Diagnosis results (20 diagnoses)
-├── users.csv                  # User accounts (8 users)
-├── api_keys.csv              # API keys (5 keys)
-├── audit_logs.csv            # Audit trail (15 logs)
-├── user_sessions.csv         # Active sessions (8 sessions)
-└── system_metrics.csv        # Performance metrics (20 metrics)
-```
-
-### Qdrant Collections
-
-Each CSV file maps to a Qdrant collection:
-
-| Collection | CSV File | Vector Fields | Points |
-|------------|----------|---------------|--------|
-| medical_conditions | medical_conditions.csv | condition_name + symptoms | 15 |
-| patient_cases | patient_cases.csv | chief_complaint + symptoms | 15 |
-| diagnosis_records | diagnosis_records.csv | condition_name + matching_symptoms | 20 |
-| users | users.csv | username + full_name + role | 8 |
-| api_keys | api_keys.csv | name + description | 5 |
-| audit_logs | audit_logs.csv | action + description | 15 |
-| user_sessions | user_sessions.csv | user_agent + device_info | 8 |
-| system_metrics | system_metrics.csv | metric_type + metric_name | 20 |
-
-## Configuration
-
-### Environment Variables
-
-Update your `.env` file:
-
-```bash
-# Primary Database Configuration
-PRIMARY_DATABASE=qdrant  # Use "qdrant" or "postgresql"
-
-# Qdrant Configuration
-QDRANT_HOST=localhost
-QDRANT_PORT=6333
-QDRANT_API_KEY=  # Optional, leave empty for local development
-
-# ML Model for Embeddings
-EMBEDDING_MODEL=microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
-EMBEDDING_DIMENSION=768
-```
-
-### Docker Compose Profiles
-
-```bash
-# Default: Qdrant + Redis (recommended)
-docker-compose up -d
-
-# With PostgreSQL (legacy mode)
-docker-compose --profile legacy up -d
-
-# Full stack (API + all databases)
-docker-compose --profile full up -d
-```
-
-## Usage Examples
-
-### Python API
+Or verify programmatically:
 
 ```python
 from src.database.qdrant_manager import QdrantManager
 
-# Initialize manager
 manager = QdrantManager(
-    host="localhost",
+    host="xxxxx.us-east-1.aws.cloud.qdrant.io",
     port=6333,
-    vector_size=768
+    api_key="your_api_key"
 )
 
-# Search for similar medical conditions
+for collection in ["medical_conditions", "patient_cases", "users"]:
+    count = manager.count_points(collection)
+    print(f"{collection}: {count} records")
+```
+
+## Data Structure
+
+All application data is stored in CSV files in the `/data/` directory:
+
+```
+data/
+├── medical_conditions.csv    # 15 medical conditions (heart attack, diabetes, etc.)
+├── patient_cases.csv          # 15 sample patient cases
+├── diagnosis_records.csv      # 20 diagnosis results
+├── users.csv                  # 8 user accounts
+├── api_keys.csv              # 5 API keys
+├── audit_logs.csv            # 15 audit trail entries
+├── user_sessions.csv         # 8 active sessions
+└── system_metrics.csv        # 20 performance metrics
+```
+
+### Medical Conditions Dataset
+
+15 common medical conditions with complete data:
+
+1. **Acute Myocardial Infarction** (Heart Attack)
+2. **Migraine with Aura**
+3. **Lung Cancer**
+4. **Rheumatoid Arthritis**
+5. **Type 2 Diabetes Mellitus**
+6. **Acute Appendicitis**
+7. **Asthma**
+8. **Congestive Heart Failure**
+9. **Hypothyroidism**
+10. **Alzheimer Disease**
+11. **Acute Ischemic Stroke**
+12. **Pneumonia**
+13. **Urinary Tract Infection**
+14. **Sepsis**
+15. **Pulmonary Embolism**
+
+Each condition includes:
+- ✅ ICD-10 and SNOMED-CT codes
+- ✅ Typical, rare, and red flag symptoms
+- ✅ Diagnostic criteria
+- ✅ Recommended tests and specialist referrals
+- ✅ Age ranges and sex predilection
+- ✅ Evidence sources and clinical guidelines
+
+## Usage Examples
+
+### Search Similar Medical Conditions
+
+```python
+from src.database.qdrant_manager import QdrantManager
+from src.config import get_settings
+
+settings = get_settings()
+manager = QdrantManager(
+    host=settings.qdrant_host,
+    port=settings.qdrant_port,
+    api_key=settings.qdrant_api_key,
+)
+
+# Find conditions matching symptoms
 results = manager.search_similar(
     collection_name="medical_conditions",
     query_text="chest pain shortness of breath sweating",
@@ -156,26 +206,40 @@ results = manager.search_similar(
 )
 
 for result in results:
-    print(f"Score: {result['score']:.3f}")
-    print(f"Condition: {result['payload']['condition_name']}")
-    print(f"ICD-10: {result['payload']['icd10_code']}")
+    print(f"Match: {result['score']:.2%}")
+    print(f"  Condition: {result['payload']['condition_name']}")
+    print(f"  ICD-10: {result['payload']['icd10_code']}")
+    print(f"  Urgency: {result['payload']['urgency_level']}")
     print()
+```
 
-# Get specific record by ID
+### Get Specific Record
+
+```python
+# Get user by ID
 user = manager.get_by_id("users", point_id=2)
-print(f"User: {user['payload']['username']}")
+print(f"Username: {user['payload']['username']}")
+print(f"Role: {user['payload']['role']}")
+```
 
-# Update data
+### Update Data
+
+```python
+# Update user's last login
 manager.update_payload(
     collection_name="users",
     point_id=2,
-    payload={"last_login_at": "2024-01-20 10:00:00"}
+    payload={"last_login_at": "2024-01-20T10:00:00"}
 )
+```
 
-# Count records with filters
+### Filter and Count
+
+```python
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
-active_users = manager.count_points(
+# Count active users
+active_count = manager.count_points(
     collection_name="users",
     filters=Filter(
         must=[
@@ -186,160 +250,191 @@ active_users = manager.count_points(
         ]
     )
 )
-print(f"Active users: {active_users}")
+print(f"Active users: {active_count}")
 ```
 
-### Adding New Data
+## Deployment to Vercel
 
-1. **Update CSV file** in `/data/` directory
-2. **Reload data**:
+### Environment Variables
+
+In Vercel dashboard, add:
+
+```
+PRIMARY_DATABASE=qdrant
+QDRANT_HOST=xxxxx.us-east-1.aws.cloud.qdrant.io
+QDRANT_PORT=6333
+QDRANT_API_KEY=<your_api_key>
+SECRET_KEY=<generate_32_char_secret>
+OPENAI_API_KEY=<your_openai_key>
+```
+
+### Build Configuration
+
+Vercel automatically detects:
+- **Frontend**: Vite build (React/Vue/Svelte)
+- **Backend**: Python serverless functions in `/api`
+
+No Docker needed! Everything runs serverless.
+
+### First Deployment
+
+1. Push your code to GitHub
+2. Connect repository to Vercel
+3. Set environment variables
+4. Deploy!
+
+Your app will use Qdrant Cloud automatically.
+
+## Adding New Data
+
+### Method 1: Update CSV and Reload
+
+1. Edit CSV file in `/data/` directory
+2. Run reload script:
 ```bash
 python scripts/init_qdrant.py
 ```
 
-Or reload specific collection:
+### Method 2: Add Programmatically
+
 ```python
 from src.database.qdrant_manager import QdrantManager
+from qdrant_client.models import PointStruct
 
-manager = QdrantManager()
-manager.load_csv_to_collection(
+manager = QdrantManager(
+    host="xxxxx.us-east-1.aws.cloud.qdrant.io",
+    api_key="your_api_key"
+)
+
+# Generate embedding for new condition
+condition_text = "Hypertension high blood pressure"
+vector = manager.generate_embedding(condition_text)
+
+# Create point
+point = PointStruct(
+    id=16,  # Next available ID
+    vector=vector,
+    payload={
+        "id": 16,
+        "condition_id": "COND016",
+        "condition_name": "Hypertension",
+        "icd_codes_json": '["I10"]',
+        "typical_symptoms_json": '["headache", "dizziness", "chest pain"]',
+        # ... more fields
+    }
+)
+
+# Upload
+manager.client.upsert(
     collection_name="medical_conditions",
-    csv_path="data/medical_conditions.csv",
-    embedding_fields=["condition_name", "typical_symptoms_json", "rare_symptoms_json"]
+    points=[point]
 )
 ```
 
-## Medical Conditions Dataset
+## Cost & Limits
 
-The `/data/medical_conditions.csv` contains 15 common medical conditions:
+### Qdrant Cloud Free Tier
 
-1. Acute Myocardial Infarction (Heart Attack)
-2. Migraine with Aura
-3. Lung Cancer
-4. Rheumatoid Arthritis
-5. Type 2 Diabetes Mellitus
-6. Acute Appendicitis
-7. Asthma
-8. Congestive Heart Failure
-9. Hypothyroidism
-10. Alzheimer Disease
-11. Acute Ischemic Stroke
-12. Pneumonia
-13. Urinary Tract Infection
-14. Sepsis
-15. Pulmonary Embolism
+- ✅ **1 GB storage** (enough for ~100,000+ medical records)
+- ✅ **Unlimited queries**
+- ✅ **All features included**
+- ✅ **No credit card required**
 
-Each condition includes:
-- ICD-10 and SNOMED codes
-- Typical and rare symptoms
-- Red flag symptoms
-- Diagnostic criteria
-- Recommended tests
-- Specialist referrals
-- Clinical evidence sources
+Current usage (all 8 collections):
+- ~106 total records
+- ~50 MB storage (well within free tier)
+- Room for 1000x growth
 
-## Troubleshooting
+### Paid Tiers (if needed later)
 
-### Qdrant not starting
+- **$25/month**: 2 GB
+- **$95/month**: 8 GB
+- **Custom**: Enterprise features
+
+## Local Development (Optional)
+
+If you want to test locally with Docker before uploading to cloud:
 
 ```bash
-# Check Qdrant logs
-docker logs doctor-ai-qdrant
+# Start local Qdrant
+docker-compose --profile local-dev up -d qdrant
 
-# Restart Qdrant
-docker-compose restart qdrant
-```
+# Update .env to use localhost
+QDRANT_HOST=localhost
+QDRANT_API_KEY=  # Leave empty
 
-### Embeddings generation slow
+# Load data locally
+python scripts/init_qdrant.py
 
-The first time you run `init_qdrant.py`, it will download the BiomedNLP-PubMedBERT model (~400MB). Subsequent runs will be faster.
-
-```bash
-# Model is cached in:
-~/.cache/huggingface/transformers/
-```
-
-### Collection already exists error
-
-```bash
-# Recreate collections (WARNING: deletes existing data)
+# When ready, switch back to cloud and reload
+QDRANT_HOST=xxxxx.us-east-1.aws.cloud.qdrant.io
+QDRANT_API_KEY=your_api_key
 python scripts/init_qdrant.py
 ```
 
-The script automatically recreates collections with `recreate=True`.
+## Troubleshooting
 
-### Port 6333 already in use
+### "Connection refused" error
 
-```bash
-# Stop existing Qdrant instance
-docker stop $(docker ps -q --filter ancestor=qdrant/qdrant)
+- ✅ Check `QDRANT_HOST` is correct (no `http://` or `https://`)
+- ✅ Verify `QDRANT_API_KEY` is set
+- ✅ Ensure cluster is running in Qdrant Cloud dashboard
 
-# Or change port in docker-compose.yml
-```
+### "Unauthorized" error
+
+- ✅ API key is correct
+- ✅ API key hasn't been revoked
+- ✅ Regenerate key if needed
+
+### Slow embedding generation
+
+First run downloads BiomedNLP-PubMedBERT model (~400MB):
+- Model cached in `~/.cache/huggingface/`
+- Subsequent runs are much faster
+- Consider using smaller model for faster processing
+
+### Collection already exists
+
+The `init_qdrant.py` script automatically recreates collections with `recreate=True`. Existing data will be replaced.
 
 ## Migration from PostgreSQL
 
 If you have existing PostgreSQL data:
 
-1. **Export data to CSV** using `scripts/export_postgres_to_csv.py` (create if needed)
-2. **Place CSVs in `/data/` directory**
-3. **Run initialization**: `python scripts/init_qdrant.py`
-4. **Update config**: Set `PRIMARY_DATABASE=qdrant` in `.env`
-5. **Test thoroughly** before decommissioning PostgreSQL
+1. Export to CSV format
+2. Place CSVs in `/data/` directory
+3. Run `python scripts/init_qdrant.py`
+4. Set `PRIMARY_DATABASE=qdrant` in environment
+5. Deploy!
 
-## Performance
+## Architecture Benefits
 
-### Benchmarks (on sample data)
+### vs PostgreSQL
+- ✅ Semantic search (find similar symptoms, not just exact matches)
+- ✅ No complex SQL queries needed
+- ✅ Better for medical AI/ML applications
+- ✅ Horizontally scalable
 
-- **Embedding generation**: ~500ms per text (using BiomedNLP-PubMedBERT)
-- **Vector search**: ~50-200ms for 1000+ points
-- **Batch upload**: ~100 points per second
-- **Collection initialization**: ~2-5 minutes (including embeddings)
-
-### Optimization Tips
-
-1. **Batch operations**: Upload in batches of 100 points
-2. **Cache embeddings**: Store pre-computed embeddings when possible
-3. **Use filters**: Combine vector search with payload filters for precision
-4. **Index tuning**: Adjust HNSW parameters for your use case
-
-## API Endpoints
-
-Update your FastAPI routes to use Qdrant:
-
-```python
-from src.database.qdrant_manager import QdrantManager
-from src.config import settings
-
-# Initialize once (e.g., in startup event)
-qdrant_manager = QdrantManager(
-    host=settings.qdrant_host,
-    port=settings.qdrant_port,
-    api_key=settings.qdrant_api_key,
-)
-
-@app.get("/diagnose")
-async def diagnose(symptoms: str):
-    # Search medical conditions by symptom similarity
-    results = qdrant_manager.search_similar(
-        collection_name="medical_conditions",
-        query_text=symptoms,
-        limit=10
-    )
-    return {"diagnoses": results}
-```
+### vs Local Database
+- ✅ Zero infrastructure management
+- ✅ Automatic backups
+- ✅ Global availability
+- ✅ Perfect for serverless (Vercel, Railway, etc.)
 
 ## Resources
 
-- **Qdrant Documentation**: https://qdrant.tech/documentation/
-- **BiomedNLP-PubMedBERT**: https://huggingface.co/microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
-- **Architecture Doc**: See `QDRANT_ARCHITECTURE.md`
+- **Qdrant Cloud**: https://cloud.qdrant.io/
+- **Qdrant Docs**: https://qdrant.tech/documentation/
+- **BiomedNLP Model**: https://huggingface.co/microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
+- **Architecture**: See `QDRANT_ARCHITECTURE.md`
 - **Sample Data**: See `/data/` directory
 
 ## Support
 
-For issues or questions:
-1. Check Qdrant logs: `docker logs doctor-ai-qdrant`
-2. Verify CSV data: `ls -lh data/`
-3. Test connection: `curl http://localhost:6333/collections`
-4. Review architecture: `QDRANT_ARCHITECTURE.md`
+Questions? Check:
+1. Qdrant Cloud dashboard for cluster status
+2. CSV files in `/data/` for data integrity
+3. Environment variables are set correctly
+4. `QDRANT_ARCHITECTURE.md` for technical details
+
+**You're all set!** 🎉 Your database is cloud-hosted, version-controlled (CSV), and ready for production.
